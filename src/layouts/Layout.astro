@@ -1,0 +1,28 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import { SITE_DESCRIPTION } from '../consts';
+
+interface Props {
+	title: string;
+	description?: string;
+	class?: string;
+}
+
+const { title, description = SITE_DESCRIPTION, class: className = '' } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={title} description={description} />
+	</head>
+	<body class="bg-paper">
+		<div class="mx-auto flex max-w-7xl flex-col gap-8 px-4 pt-6 lg:flex-row lg:px-0 lg:pt-12">
+			<Header />
+			<main class:list={['min-w-0 flex-1', className]}>
+				<slot />
+			</main>
+		</div>
+	</body>
+</html>

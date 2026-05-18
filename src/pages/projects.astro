@@ -1,0 +1,9 @@
+---
+import PageHero from '../components/PageHero.astro';
+import Layout from '../layouts/Layout.astro';
+import { SITE_TITLE } from '../consts';
+---
+
+<Layout title={`Projects | ${SITE_TITLE}`} description="Projects and experiments.">
+	<PageHero eyebrow="Projects" title="Projects" description="A minimal list of projects and experiments." />
+</Layout>

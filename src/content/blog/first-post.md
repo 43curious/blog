@@ -7,10 +7,80 @@ heroImage: '../../assets/blog-placeholder-3.jpg'
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Vitae ultricies leo integer malesuada nunc vel risus commodo viverra. Adipiscing enim eu turpis egestas pretium. Euismod elementum nisi quis eleifend quam adipiscing. In hac habitasse platea dictumst vestibulum. Sagittis purus sit amet volutpat. Netus et malesuada fames ac turpis egestas. Eget magna fermentum iaculis eu non diam phasellus vestibulum lorem. Varius sit amet mattis vulputate enim. Habitasse platea dictumst quisque sagittis. Integer quis auctor elit sed vulputate mi. Dictumst quisque sagittis purus sit amet.
 
-Morbi tristique senectus et netus. Id semper risus in hendrerit gravida rutrum quisque non tellus. Habitasse platea dictumst quisque sagittis purus sit amet. Tellus molestie nunc non blandit massa. Cursus vitae congue mauris rhoncus. Accumsan tortor posuere ac ut. Fringilla urna porttitor rhoncus dolor. Elit ullamcorper dignissim cras tincidunt lobortis. In cursus turpis massa tincidunt dui ut ornare lectus. Integer feugiat scelerisque varius morbi enim nunc. Bibendum neque egestas congue quisque egestas diam. Cras ornare arcu dui vivamus arcu felis bibendum. Dignissim suspendisse in est ante in nibh mauris. Sed tempus urna et pharetra pharetra massa massa ultricies mi.
+El color en vídeo es primero ciencia y después arte. Antes de ponernos creativos y buscar un *look* específico, necesitamos asegurarnos de que lo que vemos es técnicamente correcto. 
 
-Mollis nunc sed id semper risus in. Convallis a cras semper auctor neque. Diam sit amet nisl suscipit. Lacus viverra vitae congue eu consequat ac felis donec. Egestas integer eget aliquet nibh praesent tristique magna sit amet. Eget magna fermentum iaculis eu non diam. In vitae turpis massa sed elementum. Tristique et egestas quis ipsum suspendisse ultrices. Eget lorem dolor sed viverra ipsum. Vel turpis nunc eget lorem dolor sed viverra. Posuere ac ut consequat semper viverra nam. Laoreet suspendisse interdum consectetur libero id faucibus. Diam phasellus vestibulum lorem sed risus ultricies tristique. Rhoncus dolor purus non enim praesent elementum facilisis. Ultrices tincidunt arcu non sodales neque. Tempus egestas sed sed risus pretium quam vulputate. Viverra suspendisse potenti nullam ac tortor vitae purus faucibus ornare. Fringilla urna porttitor rhoncus dolor purus non. Amet dictum sit amet justo donec enim.
+Aquí explicaré las bases del **Color Management** (Gestión de Color), un proceso fundamental para conseguir imágenes profesionales y consistentes. Esta guía está basada en mi experiencia y en recursos como este excelente vídeo de [Teams2Film](https://www.youtube.com/watch?v=w0ubDSzEEYg).
 
-Mattis ullamcorper velit sed ullamcorper morbi tincidunt. Tortor posuere ac ut consequat semper viverra. Tellus mauris a diam maecenas sed enim ut sem viverra. Venenatis urna cursus eget nunc scelerisque viverra mauris in. Arcu ac tortor dignissim convallis aenean et tortor at. Curabitur gravida arcu ac tortor dignissim convallis aenean et tortor. Egestas tellus rutrum tellus pellentesque eu. Fusce ut placerat orci nulla pellentesque dignissim enim sit amet. Ut enim blandit volutpat maecenas volutpat blandit aliquam etiam. Id donec ultrices tincidunt arcu. Id cursus metus aliquam eleifend mi.
+## ¿Qué es la Gestión de Color?
+Imagina la gestión de color como un **traductor universal**. 
 
-Tempus quam pellentesque nec nam aliquam sem. Risus at ultrices mi tempus imperdiet. Id porta nibh venenatis cras sed felis eget velit. Ipsum a arcu cursus vitae. Facilisis magna etiam tempor orci eu lobortis elementum. Tincidunt dui ut ornare lectus sit. Quisque non tellus orci ac. Blandit libero volutpat sed cras. Nec tincidunt praesent semper feugiat nibh sed pulvinar proin gravida. Egestas integer eget aliquet nibh praesent tristique magna.
+Tu cámara y tu monitor hablan idiomas diferentes. Capturar imágenes y reproducirlas son dos tareas que requieren de herramientas diversas y, de una manera coherente de traducirlas entre sí. La gestión de color tiene, a mi parecer, dos objetivos fundamentales:
+- Capturar y preservar la mayor cantidad de información posible. 
+- Que todas las personas involucradas en el proceso vean lo mismo.
+
+La gestión de color es el flujo de trabajo que asegura que esa traducción sea matemáticamente perfecta en tres etapas: **Entrada (Cámara)**, **Proceso (Edición)** y **Salida (Pantalla)**.
+
+
+## Entrada: Perfiles Logarítmicos (LOG)
+La mayoría de cámaras profesionales y *prosumer* graban en lo que llamamos perfiles **Logarítmicos** (S-Log3 de Sony, C-Log de Canon, V-Log de Panasonic, etc.).
+
+Cuando grabamos algo, capturamos información de luz y color. Aquello que capturamos se *transforma* de valores matemáticos a pixeles. Los números se representan como una imagen (muy simplificado). Y en ese proceso, hay varias maneras de *transformar* los valores matemáticos que capturamos en imágenes completas. 
+
+- La primera forma es lineal. Cada valor de luz que captura el sensor corresponde de forma directa a un valor de color y de luz en la imagen final. 
+- La segunda forma es logarítmica. Los valores de altas luces y sombras se conservan. En vez de grabarse de manera lineal, se *aplanan* para conservar detalles. 
+
+### ¿Por qué se ven grises y planos?
+Cuando ves un archivo LOG sin procesar, se ve gris, con poco contraste y colores apagados. Esto no es un error; es una ventaja.
+- **Rango Dinámico**: Al "aplanar" la imagen, la cámara es capaz de guardar mucha más información en las sombras y en las luces altas sin perder detalle (clipping).
+- **Flexibilidad**: Es como un negativo digital. Tienes mucha más libertad para corregir la exposición y el color en post-producción sin romper la imagen.
+
+El perfil LOG es el "idioma nativo" de tu cámara.
+
+## Flujo de trabajo en DaVinci Resolve
+DaVinci Resolve es el estándar de la industria en gestión de color y entalonaje. Es importante entender que hay dos grandes caminos para gestionar el color: **Manual** y **Automático**.
+
+### Método Manual (DaVinci YRGB)
+Es el método que viene por defecto, el manual.
+- **Cómo funciona**: Tú eres responsable de todo. El proyecto no gestiona nada. Para convertir un clip LOG a Rec.709, debes añadir manualmente un nodo de efecto llamado **Color Space Transform (CST)** en cada clip o a nivel de timeline.
+- **Ventajas**: Control absoluto. Nada pasa sin que tú lo hagas.
+- **Desventajas**: Muy lento y cansado, sobre todo en proyectos largos.
+
+### Método Automático (DaVinci YRGB Color Managed)
+Aquí activamos el motor inteligente de DaVinci. Se hace desde `Project Settings > Color Management > DaVinci YRGB Color Managed`. Al activarlo, DaVinci lee los metadatos de tus archivos (si es RAW) o tu selección de espacio cromático inicial en base a tu cámara, y él se encarga de todas las transformaciones matemáticas en segundo plano.
+
+¿Qué pasa de fondo?
+En esencia, DaVinci está cambiando espacios de color, los está traduciendo. Para hacer esto, DaVinci utiliza un espacio de color de trabajo llamado DaVinci Wide Gamut Intermediate. ste espacio, es un espacio de color muy amplio que puede representar valores cromáticos y luminosos mayores que el espectro visible. Los cambios se hacen en este espacio de trabajo para conseguir la máxima flexibilidad. Pero la visualización final se hace en Rec.709. 
+
+Dentro del método automático, hay niveles de jerarquía:
+- **Nivel Proyecto**: Afecta a todo el proyecto. 
+- **Nivel Timeline** (Recomendado): Esta es la opción más moderna y flexible. Puedes configurar la gestión de color *por línea de tiempo*.
+
+### Mi Recomendación: Gestión por Timeline
+Esta opción nos da lo mejor de los dos mundos. Permite tener, en un mismo proyecto:
+- Una línea de tiempo en **Rec.709 SDR** (para YouTube).
+- Otra línea de tiempo en **Rec.2020 HDR** (para Netflix o TV moderna).
+
+Al hacer esto, tus clips LOG se verán automáticamente correctos y tendrás la flexibilidad profesional para entregar en cualquier formato.
+
+## Gamma shift 
+Uno de los problemas más comunes al trabajar en Mac es el **Gamma Shift**: exportas un vídeo que se ve perfecto en DaVinci, pero al abrirlo en QuickTime o subirlo a la web, la imagen se ve "lavada", con menos contraste y colores más pálidos.
+
+### ¿Por qué ocurre?
+El estándar de la industria para vídeo (Rec.709) utiliza un Gamma de **2.4**. Sin embargo, Apple utiliza su propio motor de gestión de color llamado **ColorSync**, que interpreta el contenido Rec.709 con un Gamma aproximado de **1.96**. Esa diferencia matemática es la que hace que las sombras se aclaren artificialmente al salir del entorno de edición.
+
+### La Solución
+Para que lo que ves en DaVinci coincida con lo que verás en el ecosistema de Apple, debes "hablar su idioma":
+
+1.  **Output Color Space**: En `Project Settings > Color Management`, establece el espacio de salida como **Rec.709 Scene**. Esto añade una etiqueta específica que ColorSync entiende correctamente.
+2.  **Preferencias de DaVinci**: Ve a `Preferences > System > General` y activa la casilla **"Use Mac Display Color Profiles for Viewers"**. Esto hará que el visor de DaVinci use el perfil de tu monitor Mac mientras trabajas.
+3.  **Tags de Exportación**: En la pestaña *Deliver*, asegúrate de que los "Gamma Tags" estén en `Same as Project` o explícitamente en `Rec.709`.
+
+Con esto, eliminas la incertidumbre y aseguras que tu contraste se mantenga intacto tras el render.
+
+## Resumen
+
+- **Input**: La cámara captura el máximo detalle posible (LOG).
+- **Transformación**: El software convierte esos datos a un espacio de trabajo amplio.
+- **Output**: El software "revela" la imagen final compatible con las pantallas (Rec.709).
+
+Entender esto te separa de los aficionados. Dejas de "arreglar" clips y empiezas a "revelar" imágenes.

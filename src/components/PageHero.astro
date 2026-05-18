@@ -1,0 +1,21 @@
+---
+interface Props {
+	eyebrow?: string;
+	title: string;
+	description?: string;
+}
+
+const { eyebrow, title, description } = Astro.props;
+---
+
+<section class="hero-section relative isolate flex min-h-[320px] flex-col items-center justify-center overflow-hidden border border-line bg-white p-10 text-center md:min-h-[400px]">
+	<slot />
+	<h1 class="relative z-10 font-[-apple-system,BlinkMacSystemFont,'SF_Pro_Display','SF_Pro_Text','Helvetica_Neue',Arial,sans-serif] text-sm font-medium uppercase tracking-[0.32em] text-muted">
+		{eyebrow || title}
+	</h1>
+	{description && (
+		<p class="relative z-10 mt-4 font-[-apple-system,BlinkMacSystemFont,'SF_Pro_Display','SF_Pro_Text','Helvetica_Neue',Arial,sans-serif] text-sm font-medium uppercase tracking-[0.32em] text-muted">
+			{description}
+		</p>
+	)}
+</section>

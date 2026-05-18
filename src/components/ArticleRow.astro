@@ -1,0 +1,15 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import FormattedDate from './FormattedDate.astro';
+
+interface Props {
+post: CollectionEntry<'blog'>;
+}
+
+const { post } = Astro.props;
+---
+
+<a href={`/blog/${post.id}/`} class="article-row flex items-baseline justify-between gap-6 p-5 transition-colors hover:bg-soft">
+	<span class="font-mono text-sm uppercase leading-none tracking-[0.14em]">{post.data.title}</span>
+	<span class="shrink-0 font-mono text-xs text-muted"><FormattedDate date={post.data.pubDate} /></span>
+</a>
