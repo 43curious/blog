@@ -2,6 +2,7 @@
 title: 'Using MDX'
 description: 'Lorem ipsum dolor sit amet'
 pubDate: 'Jun 01 2024'
+articleType: 'interests'
 heroImage: '../../assets/blog-placeholder-5.jpg'
 ---
 
@@ -19,10 +20,232 @@ Here is how you import and use a UI component inside of MDX.
 When you open this page in the browser, you should see the clickable button below.
 
 import HeaderLink from '../../components/HeaderLink.astro';
+import Chart from '../../components/Chart.astro';
 
 <HeaderLink href="#" onclick="alert('clicked!')">
 	Embedded component in MDX
 </HeaderLink>
+
+## Líneas: datos medidos
+
+A line chart accepts numeric `{ x, y }` values. Hover a line or its legend item to isolate it.
+
+export const weeklyViews = [
+	{ label: 'Vídeos largos', color: '#4137ff', values: [{ x: 1, y: 240 }, { x: 2, y: 310 }, { x: 3, y: 280 }, { x: 4, y: 420 }, { x: 5, y: 510 }, { x: 6, y: 480 }] },
+	{ label: 'Clips', color: '#e03131', values: [{ x: 1, y: 180 }, { x: 2, y: 220 }, { x: 3, y: 260 }, { x: 4, y: 250 }, { x: 5, y: 330 }, { x: 6, y: 390 }] },
+];
+
+<Chart
+	mode="line"
+	title="Visualizaciones semanales"
+	xLabel="Semana"
+	yLabel="Visualizaciones"
+	showTooltip
+	animateOnScroll
+	series={weeklyViews}
+/>
+
+## Líneas: sin puntos ni cuadrícula
+
+Use `showPoints={false}` and `showGrid={false}` for a quieter chart.
+
+export const renderTimes = [
+	{ label: 'GPU', color: '#008f5a', values: [{ x: 1, y: 42 }, { x: 2, y: 38 }, { x: 3, y: 35 }, { x: 4, y: 31 }, { x: 5, y: 29 }] },
+	{ label: 'CPU', color: '#d9480f', values: [{ x: 1, y: 68 }, { x: 2, y: 61 }, { x: 3, y: 57 }, { x: 4, y: 49 }, { x: 5, y: 45 }] },
+];
+
+<Chart
+	mode="line"
+	title="Tiempo de renderizado optimizado"
+	xLabel="Versión"
+	yLabel="Segundos"
+	showPoints={false}
+	showGrid={false}
+	series={renderTimes}
+/>
+
+## Líneas: toggle de dos estados
+
+A line chart can optionally cycle between two states with one toggle.
+
+export const toggleLines = [
+	{ label: 'Alta', state: 0, color: '#4137ff', values: [{ x: 1, y: 90 }, { x: 2, y: 84 }, { x: 3, y: 76 }, { x: 4, y: 68 }] },
+	{ label: 'Baja', state: 1, color: '#008f5a', values: [{ x: 1, y: 144 }, { x: 2, y: 132 }, { x: 3, y: 124 }, { x: 4, y: 116 }] },
+];
+
+<Chart
+	mode="line"
+	title="Calidad de imagen"
+	xLabel="Escena"
+	yLabel="AVG FPS"
+	toggle={{ labels: ['Alta', 'Baja'] }}
+	series={toggleLines}
+/>
+
+## Curvas: funciones
+
+A curve chart samples a JavaScript function across `xDomain`, which is useful for benchmarks and projections.
+
+export const benchmarks = [
+	{ label: 'Proceso A', color: '#4137ff', fn: (x) => 12 + x * 1.8 + x * x * 0.12 },
+	{ label: 'Proceso B', color: '#e03131', fn: (x) => 18 + x * 1.1 + x * x * 0.2 },
+];
+
+<Chart
+	mode="curve"
+	title="Tiempo de renderizado"
+	xLabel="Complejidad"
+	yLabel="Segundos"
+	xDomain={[0, 10]}
+	series={benchmarks}
+/>
+
+## Curvas: funciones matemáticas
+
+Functions can also describe waves, thresholds, or other models.
+
+export const signalModels = [
+	{ label: 'Onda', color: '#0077ff', fn: (x) => Math.sin(x) * 8 },
+	{ label: 'Límite', color: '#7048e8', fn: (x) => 4 + Math.cos(x * 0.7) * 2 },
+];
+
+<Chart
+	mode="curve"
+	title="Modelos de señal"
+	xLabel="Tiempo"
+	yLabel="Amplitud"
+	xDomain={[0, 12]}
+	yDomain={[-10, 10]}
+	series={signalModels}
+/>
+
+## Barras: comparar categorías
+
+Use `bar` for grouped vertical bars. Each point's `x` value becomes a category label.
+
+export const projectCosts = [
+	{ label: 'Producción', color: '#4137ff', values: [{ x: 'Equipo', y: 1200 }, { x: 'Rodaje', y: 2400 }, { x: 'Post', y: 1800 }] },
+	{ label: 'Estimación', color: '#d9480f', values: [{ x: 'Equipo', y: 1500 }, { x: 'Rodaje', y: 2100 }, { x: 'Post', y: 2200 }] },
+];
+
+<Chart
+	mode="bar"
+	title="Coste del proyecto"
+	xLabel="Partida"
+	yLabel="Euros"
+	yDomain={[0, 3000]}
+	series={projectCosts}
+/>
+
+## Torre: una serie de costes
+
+`tower` is a compact alias for a single-series vertical cost graph.
+
+export const monthlyCosts = [
+	{ label: 'Coste', color: '#e03131', values: [{ x: 'Ene', y: 320 }, { x: 'Feb', y: 460 }, { x: 'Mar', y: 390 }, { x: 'Abr', y: 580 }, { x: 'May', y: 510 }] },
+];
+
+<Chart
+	mode="tower"
+	title="Coste mensual"
+	xLabel="Mes"
+	yLabel="Euros"
+	yDomain={[0, 700]}
+	series={monthlyCosts}
+/>
+
+## Rendimiento por vatio: GPUs modernas
+
+Cada punto representa una GPU en un juego concreto. El eje X muestra el consumo en vatios y el eje Y los FPS medios; al pasar por encima de un punto aparece el juego y el resultado exacto.
+
+export const gpuEfficiency = [
+	{
+		label: 'RTX 5090',
+		color: '#4137ff',
+		values: [
+			{ x: 575, y: 165, label: 'Cyberpunk 2077' },
+			{ x: 575, y: 210, label: 'Baldur\'s Gate 3' },
+			{ x: 575, y: 230, label: 'Forza Horizon 5' },
+		],
+	},
+	{
+		label: 'RTX 5080',
+		color: '#e03131',
+		values: [
+			{ x: 360, y: 145, label: 'Cyberpunk 2077' },
+			{ x: 360, y: 185, label: 'Baldur\'s Gate 3' },
+			{ x: 360, y: 205, label: 'Forza Horizon 5' },
+		],
+	},
+	{
+		label: 'RTX 5070 Ti',
+		color: '#008f5a',
+		values: [
+			{ x: 300, y: 125, label: 'Cyberpunk 2077' },
+			{ x: 300, y: 168, label: 'Baldur\'s Gate 3' },
+			{ x: 300, y: 185, label: 'Forza Horizon 5' },
+		],
+	},
+	{
+		label: 'RX 9070 XT',
+		color: '#d9480f',
+		values: [
+			{ x: 304, y: 138, label: 'Cyberpunk 2077' },
+			{ x: 304, y: 178, label: 'Baldur\'s Gate 3' },
+			{ x: 304, y: 198, label: 'Forza Horizon 5' },
+		],
+	},
+	{
+		label: 'Arc B580',
+		color: '#0077ff',
+		values: [
+			{ x: 190, y: 82, label: 'Cyberpunk 2077' },
+			{ x: 190, y: 116, label: 'Baldur\'s Gate 3' },
+			{ x: 190, y: 130, label: 'Forza Horizon 5' },
+		],
+	},
+];
+
+<Chart
+	mode="scatter"
+	title="Rendimiento por vatio en GPUs"
+	xLabel="Vatios"
+	yLabel="AVG FPS"
+	xDomain={[100, 650]}
+	yDomain={[0, 240]}
+	showTooltip
+	series={gpuEfficiency}
+/>
+
+## Log picture profiles
+
+export const logLines= [
+	{ label: 'SLog3', state: 0, color: '#4137ff',  fn: (x) => x * 1 },
+	{ label: 'Rec709', state: 1, color: '#008f5a', values: [{x: 0, y:0}, { x: 1, y: 1 }, { x: 2, y: 2 }, { x: 3, y: 3 }, { x: 4, y: 4 }] },
+];
+
+<Chart
+	mode="curve"
+	title="Calidad de imagen"
+	xLabel="Escena"
+	yLabel="AVG FPS"
+	toggle={{ labels: ['Alta', 'Baja'] }}
+	series={logLines}
+/>
+
+
+
+## Tabla: comparar resultados
+
+Las tablas Markdown funcionan directamente en archivos `.mdx` y reciben el estilo de la página.
+
+| GPU | Consumo | AVG FPS | FPS/W |
+| --- | ---: | ---: | ---: |
+| RTX 5090 | 575 W | 202 | 0.35 |
+| RTX 5080 | 360 W | 178 | 0.49 |
+| RTX 5070 Ti | 300 W | 159 | 0.53 |
+| RX 9070 XT | 304 W | 171 | 0.56 |
+| Arc B580 | 190 W | 109 | 0.57 |
 
 ## More Links
 

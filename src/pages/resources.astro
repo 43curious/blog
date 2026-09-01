@@ -1,0 +1,102 @@
+---
+import ContentGrid from '../components/ContentGrid.astro';
+import PageHeader from '../components/PageHeader.astro';
+import ResourceLibrary from '../components/ResourceLibrary.astro';
+import Layout from '../layouts/Layout.astro';
+
+const title = 'Recursos audiovisuales';
+const description = 'Una lista extensa para ayudarte en tus necesidades audiovisuales';
+
+export const RESOURCES = [
+	// Utilidades
+	{ name: 'Coolors', url: 'https://coolors.co/', star: true, category: 'utilidades' },
+	{ name: 'Cobalt Tools', url: 'https://cobalt.meowing.de/', category: 'utilidades' },
+	{ name: 'Khroma', url: 'https://www.khroma.co/', category: 'utilidades' },
+	{ name: 'Goyo Voice Separator', url: 'https://goyo.app/', category: 'utilidades' },
+	{ name: 'Adobe Podcast', url: 'https://podcast.adobe.com/', category: 'utilidades' },
+	{ name: 'Moises AI', url: 'https://moises.ai/', category: 'utilidades' },
+	{ name: 'Lochie Video Compression', url: 'https://compress.lochie.me/', category: 'utilidades' },
+	// Música
+	{ name: 'Soundly', url: 'https://getsoundly.com/', star: true, category: 'musica' },
+	{ name: 'Musicbed', url: 'https://www.musicbed.com/', star: true, category: 'musica' },
+	{ name: 'Epidemic Sound', url: 'https://www.epidemicsound.com/', category: 'musica' },
+	{ name: 'wirebeats', url: 'https://www.wirebeats.com/', category: 'musica' },
+	{ name: 'Artlist', url: 'https://artlist.io/', star: true, category: 'musica' },
+	{ name: 'Marmoset', url: 'https://www.marmosetmusic.com/', category: 'musica' },
+	{ name: 'BOOM Library', url: 'https://www.boomlibrary.com/', category: 'musica' },
+	{ name: 'Adobe Audition SFX', url: 'https://www.adobe.com/products/audition/offers/AdobeAuditionDLCSFX.html', category: 'musica' },
+	// Frames
+	{ name: 'Shotdeck', url: 'https://shotdeck.com/', category: 'frames' },
+	{ name: 'Shot.Cafe', url: 'https://shot.cafe/', category: 'frames' },
+	{ name: 'Frame Set', url: 'https://frameset.app/search', category: 'frames' },
+	{ name: 'Filmgrab', url: 'https://film-grab.com/', category: 'frames' },
+	{ name: 'Film AI', url: 'https://flim.ai/', category: 'frames' },
+	{ name: 'Movie screencaps', url: 'https://movie-screencaps.com/', category: 'frames' },
+	{ name: 'Evan E Richards', url: 'https://www.evanerichards.com/index/', category: 'frames' },
+	{ name: 'Film Vibes', url: 'https://filmvibes.io/', category: 'frames' },
+	{ name: 'Still Labs', url: 'https://stillslab.com/', category: 'frames' },
+	{ name: 'FilmSUpply', url: 'https://www.filmsupply.com/', category: 'frames' },
+	{ name: 'MovieStills DB', url: 'https://www.moviestillsdb.com/', category: 'frames' },
+	// Tipografías
+	{ name: 'Fontshare', url: 'https://www.fontshare.com/', star: true, category: 'tipografias' },
+	{ name: 'Awwwards Fonts', url: 'https://www.awwwards.com/awwwards/collections/free-fonts/', category: 'tipografias' },
+	{ name: 'Use & Modify', url: 'https://usemodify.com/', category: 'tipografias' },
+	{ name: 'Open Foundry', url: 'https://open-foundry.com/fonts', category: 'tipografias' },
+	{ name: 'TypeType®', url: 'https://typetype.org/freefonts/', category: 'tipografias' },
+	{ name: 'Fontfabric™', url: 'https://www.fontfabric.com/free-fonts/', category: 'tipografias' },
+	{ name: 'The League of Moveable Type', url: 'https://www.theleagueofmoveabletype.com/', category: 'tipografias' },
+	{ name: 'Velvetyne', url: 'https://velvetyne.fr/', category: 'tipografias' },
+	{ name: 'Kern Club', url: 'https://www.kernclub.com/shop?category=Fonts', category: 'tipografias' },
+	{ name: 'Brandon Nickerson', url: 'https://www.bnicks.com/shop', category: 'tipografias' },
+	{ name: 'Freebies Dirtyline Studio', url: 'https://dirtylinestudio.com/freebies/', category: 'tipografias' },
+	{ name: 'NAURYZREDKEDS', url: 'https://www.behance.net/gallery/196325487/FREE-FONT-NAURYZREDKEDS', category: 'tipografias' },
+	{ name: 'OT Build', url: 'https://www.behance.net/gallery/199673975/OT-Bulb-Free-Font', category: 'tipografias' },
+	{ name: 'Coolors Fonts', url: 'https://coolors.co/fonts', category: 'tipografias' },
+	{ name: 'Free Faces', url: 'https://www.freefaces.gallery/', category: 'tipografias' },
+	{ name: 'Fontesk', url: 'https://fontesk.com/', category: 'tipografias' },
+	{ name: 'atipo foundry', url: 'https://www.atipofoundry.com/', category: 'tipografias' },
+	{ name: 'Off Type Foundry', url: 'https://off-type.com/', category: 'tipografias' },
+	// Color
+	{ name: 'Color.io', url: 'https://color.io/', category: 'color' },
+	{ name: 'Dehancer', url: 'https://www.dehancer.com/shop/video/davinci_resolve', category: 'color' },
+	{ name: 'Filmkid LUTs', url: 'https://filmkid.com/', category: 'color' },
+	{ name: 'Filmbox', url: 'https://videovillage.com/filmbox/', category: 'color' },
+	// Stock
+	{ name: 'Mixkit', url: 'https://mixkit.co/', star: true, category: 'stock' },
+	// Diseño
+	{ name: 'DoingCoolStuff', url: 'https://www.doingcoolstuff.xyz/', category: 'diseno' },
+	{ name: 'SAVEE', url: 'https://savee.it/', category: 'diseno' },
+	{ name: 'Designspiration', url: 'https://www.designspiration.com/', category: 'diseno' },
+	{ name: 'Awwwards', url: 'https://www.awwwards.com/#sotd', category: 'diseno' },
+	{ name: 'Buck Design Studio', url: 'https://www.buck.co/', category: 'diseno' },
+	{ name: 'Refero', url: 'https://refero.design/apps', category: 'diseno' },
+	{ name: 'Bento Grids', url: 'https://bentogrids.com/', category: 'diseno' },
+	{ name: 'Tendril Studio', url: 'https://tendril.studio/', category: 'diseno' },
+	{ name: 'DIELINE', url: 'https://thedieline.com/', category: 'diseno' },
+	{ name: 'ilovecreatives', url: 'https://ilovecreatives.com/', category: 'diseno' },
+	{ name: 'visuelle', url: 'https://visuelle.co.uk/', category: 'diseno' },
+	// Motion
+	{ name: 'Opal Work Icons', url: 'https://www.opal.work/', category: 'motion' },
+	{ name: 'Boostrap Icons', url: 'https://icons.getbootstrap.com/', category: 'motion' },
+	{ name: 'Reshot', url: 'https://www.reshot.com/', category: 'motion' },
+	{ name: 'Drawkit illustrations', url: 'https://www.drawkit.com/illustration-types/2d', category: 'motion' },
+	{ name: 'After Effects expressions', url: 'https://www.motionscript.com/', category: 'motion' },
+	{ name: 'Minimal Mockups', url: 'https://www.minimalmockups.com/', category: 'motion' },
+	{ name: 'Mesh Gradient', url: 'https://meshgradient.com/', category: 'motion' },
+	{ name: 'Image to Mesh', url: 'https://photogradient.com/', category: 'motion' },
+	{ name: 'Noun Project', url: 'https://thenounproject.com/', star: true, category: 'motion' },
+	{ name: 'Slidesgo', url: 'https://slidesgo.com/', star: true, category: 'motion' },
+	// Youtube
+	{ name: 'Team2Films', url: 'https://www.youtube.com/@team2films/videos', category: 'youtube' },
+	{ name: 'Gerald Undone', url: 'https://www.youtube.com/@geraldundone', category: 'youtube' },
+	{ name: 'Curtis Judd', url: 'https://www.youtube.com/@curtisjudd/featured', category: 'youtube' },
+	{ name: 'Texture labs', url: 'https://www.youtube.com/@Texturelabs/videos', category: 'youtube' },
+];
+---
+
+<Layout title={title} description={description}>
+	<ContentGrid>
+		<PageHeader eyebrow="Biblioteca" title="Recursos" description={description} />
+		<ResourceLibrary resources={RESOURCES} />
+	</ContentGrid>
+</Layout>

@@ -1,0 +1,189 @@
+---
+interface Resource {
+	name: string;
+	url: string;
+	star?: boolean;
+	category: string;
+}
+
+interface Props {
+	resources: Resource[];
+}
+
+const { resources } = Astro.props;
+const categories = [...new Set(resources.map((resource) => resource.category))];
+const categoryLabels: Record<string, string> = {
+	utilidades: 'Utilidades',
+	musica: 'Música',
+	frames: 'Frames',
+	tipografias: 'Tipografías',
+	color: 'Color',
+	stock: 'Stock',
+	diseno: 'Diseño',
+	motion: 'Motion',
+	youtube: 'YouTube',
+};
+const categoryStyles: Record<string, { filter: string; accent: string; text: string }> = {
+	utilidades: {
+		filter: 'text-[#8f2cff] hover:bg-[#8f2cff] data-[active=true]:bg-[#8f2cff]',
+		accent: 'before:bg-[#8f2cff]',
+		text: 'text-[#8f2cff]',
+	},
+	musica: {
+		filter: 'text-[#d9480f] hover:bg-[#d9480f] data-[active=true]:bg-[#d9480f]',
+		accent: 'before:bg-[#d9480f]',
+		text: 'text-[#d9480f]',
+	},
+	frames: {
+		filter: 'text-[#0077ff] hover:bg-[#0077ff] data-[active=true]:bg-[#0077ff]',
+		accent: 'before:bg-[#0077ff]',
+		text: 'text-[#0077ff]',
+	},
+	tipografias: {
+		filter: 'text-[#008f5a] hover:bg-[#008f5a] data-[active=true]:bg-[#008f5a]',
+		accent: 'before:bg-[#008f5a]',
+		text: 'text-[#008f5a]',
+	},
+	color: {
+		filter: 'text-[#b08900] hover:bg-[#b08900] data-[active=true]:bg-[#b08900]',
+		accent: 'before:bg-[#b08900]',
+		text: 'text-[#b08900]',
+	},
+	stock: {
+		filter: 'text-[#d63384] hover:bg-[#d63384] data-[active=true]:bg-[#d63384]',
+		accent: 'before:bg-[#d63384]',
+		text: 'text-[#d63384]',
+	},
+	diseno: {
+		filter: 'text-[#0ca678] hover:bg-[#0ca678] data-[active=true]:bg-[#0ca678]',
+		accent: 'before:bg-[#0ca678]',
+		text: 'text-[#0ca678]',
+	},
+	motion: {
+		filter: 'text-[#7048e8] hover:bg-[#7048e8] data-[active=true]:bg-[#7048e8]',
+		accent: 'before:bg-[#7048e8]',
+		text: 'text-[#7048e8]',
+	},
+	youtube: {
+		filter: 'text-[#e03131] hover:bg-[#e03131] data-[active=true]:bg-[#e03131]',
+		accent: 'before:bg-[#e03131]',
+		text: 'text-[#e03131]',
+	},
+};
+---
+
+<section data-resource-library>
+	<div class="flex flex-col items-stretch gap-3 md:flex-row md:items-start md:justify-between md:gap-6">
+		<div class="-mx-1 flex snap-x snap-proximity flex-nowrap gap-x-5 gap-y-2 overflow-x-auto overscroll-x-contain px-1 pb-1 [scrollbar-width:none] [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden md:mx-0 md:flex-wrap md:overflow-visible md:px-0 md:pb-0" aria-label="Filtrar recursos">
+			{categories.map((category) => (
+				<button
+					type="button"
+					class:list={[
+						'resource-filter snap-start cursor-pointer whitespace-nowrap bg-transparent text-xs font-semibold uppercase tracking-[0.12em] transition-colors duration-150 hover:text-white data-[active=true]:text-white',
+						categoryStyles[category].filter,
+					]}
+					data-filter={category}
+				>
+					{categoryLabels[category] ?? category}
+				</button>
+			))}
+			<button
+				type="button"
+				class="resource-filter snap-start cursor-pointer whitespace-nowrap bg-transparent text-xs font-medium uppercase tracking-[0.12em] text-muted transition-colors duration-150 hover:bg-ink hover:text-white data-[active=true]:bg-ink data-[active=true]:text-white"
+				data-filter-free
+				aria-label="Solo gratis"
+				title="Solo gratis"
+			>
+				GRATIS
+			</button>
+		</div>
+		<button type="button" class="shrink-0 self-start text-xs font-medium uppercase tracking-[0.12em] text-muted transition-colors hover:text-ink" data-clear-filters>
+			Limpiar
+		</button>
+	</div>
+</section>
+
+<section class="mt-6 overflow-x-auto" aria-label="Recursos audiovisuales">
+	<table class="w-full min-w-[36rem] table-fixed border-collapse text-left">
+		<colgroup>
+			<col class="w-9/12" />
+			<col class="w-3/12" />
+		</colgroup>
+		<thead class="border-b border-line text-xs uppercase tracking-[0.1em] text-muted">
+			<tr>
+				<th scope="col" class="px-4 py-3 font-bold">Enlace</th>
+				<th scope="col" class="px-4 py-3 text-right font-bold">Categoría</th>
+			</tr>
+		</thead>
+		<tbody>
+			{resources.map((resource) => (
+				<tr class="resource-row border-b border-line transition-colors duration-150 hover:bg-soft" data-category={resource.category} data-paid={resource.star ? 'true' : 'false'}>
+					<td class="px-4 py-4 align-top text-sm leading-6">
+						<a
+							href={resource.url}
+							class="group inline"
+							target="_blank"
+							rel="noreferrer"
+						>
+							<span class:list={[
+								'relative isolate inline-block w-fit overflow-hidden px-[0.15em] font-semibold uppercase tracking-[0.08em] before:absolute before:inset-0 before:-z-10 before:origin-left before:scale-x-0 before:transition-transform before:duration-150 group-hover:text-paper group-hover:before:scale-x-100 group-focus-visible:text-paper group-focus-visible:before:scale-x-100',
+								categoryStyles[resource.category].accent,
+							]}>{resource.name}</span>
+						</a>
+					</td>
+					<td class="px-4 py-4 text-right align-top text-sm leading-6">
+						<span class={categoryStyles[resource.category].text}>{categoryLabels[resource.category] ?? resource.category}{resource.star && <span> · $</span>}</span>
+					</td>
+				</tr>
+			))}
+		</tbody>
+	</table>
+</section>
+
+
+<script>
+	const library = document.querySelector('[data-resource-library]');
+	const filterButtons = Array.from(document.querySelectorAll('[data-filter]'));
+	const freeButton = document.querySelector('[data-filter-free]');
+	const clearButton = document.querySelector('[data-clear-filters]');
+	const rows = Array.from(document.querySelectorAll('.resource-row'));
+	const active = new Set();
+	let freeOnly = false;
+
+	const applyFilters = () => {
+		filterButtons.forEach((button) => {
+			button.dataset.active = String(active.has(button.dataset.filter));
+		});
+		if (freeButton) freeButton.dataset.active = String(freeOnly);
+
+		rows.forEach((row) => {
+			const category = row.dataset.category;
+			const isPaid = row.dataset.paid === 'true';
+			const categoryMatches = active.size === 0 || active.has(category);
+			const priceMatches = !freeOnly || !isPaid;
+			row.classList.toggle('hidden', !(categoryMatches && priceMatches));
+		});
+	};
+
+	if (library) {
+		filterButtons.forEach((button) => {
+			button.addEventListener('click', () => {
+				const category = button.dataset.filter;
+				if (!category) return;
+				active.has(category) ? active.delete(category) : active.add(category);
+				applyFilters();
+			});
+		});
+
+		freeButton?.addEventListener('click', () => {
+			freeOnly = !freeOnly;
+			applyFilters();
+		});
+
+		clearButton?.addEventListener('click', () => {
+			active.clear();
+			freeOnly = false;
+			applyFilters();
+		});
+	}
+</script>

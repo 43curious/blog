@@ -1,30 +1,93 @@
 ---
-import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import ArticleList from '../components/ArticleList.astro';
-import PageHero from '../components/PageHero.astro';
+import ContentGrid from '../components/ContentGrid.astro';
+import PageHeader from '../components/PageHeader.astro';
 import Layout from '../layouts/Layout.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import { SITE_TITLE } from '../consts';
 
 const posts = (await getCollection('blog')).sort(
-(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
+const articleTypes = [...new Set(posts.map((post) => post.data.articleType))];
+const articleTypeLabels: Record<string, string> = {
+	guides: 'Guías',
+	interests: 'Intereses',
+};
+const articleTypeStyles: Record<string, string> = {
+	guides: 'text-[#4137ff] hover:bg-[#4137ff] data-[active=true]:bg-[#4137ff]',
+	interests: 'text-[#d9480f] hover:bg-[#d9480f] data-[active=true]:bg-[#d9480f]',
+};
 ---
 
-<Layout title={SITE_TITLE} description={SITE_DESCRIPTION}>
-  <div class="article-hover-stage">
-    <PageHero eyebrow="Blog" title="Blog" description="Essays, notes, and articles.">
-      <div class="hero-preview-stack" aria-hidden="true">
-        { posts.map((post) => ( <div class="hero-preview-frame"> {post.data.heroImage && (
-        <Image
-            src={post.data.heroImage}
-            alt=""
-            width={1280}
-            height={640}
-            class="hero-preview-image" /> )}
-        </div>))}
-      </div>
-    </PageHero>
-    <ArticleList posts={posts} />
-  </div>
+<Layout title={SITE_TITLE} description="Notas y recursos para trabajo audiovisual.">
+	<ContentGrid>
+		<PageHeader
+			eyebrow="Blog"
+			title="Sobre mi"
+			description="Pruebo herramientas, ordeno referencias y escribo lo que vuelve el proceso creativo más claro, rápido y útil."
+		/>
+
+		<section aria-label="Artículos del blog" data-article-library>
+			<div class="flex flex-col items-stretch gap-3 md:flex-row md:items-start md:justify-between md:gap-6">
+				<div class="-mx-1 flex snap-x snap-proximity flex-nowrap gap-x-5 gap-y-2 overflow-x-auto overscroll-x-contain px-1 pb-1 [scrollbar-width:none] [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden md:mx-0 md:flex-wrap md:overflow-visible md:px-0 md:pb-0" aria-label="Filtrar artículos">
+					{articleTypes.map((articleType) => (
+						<button
+							type="button"
+							class:list={[
+								'snap-start cursor-pointer whitespace-nowrap bg-transparent text-xs font-semibold uppercase tracking-[0.12em] transition-colors duration-150 hover:text-white data-[active=true]:text-white',
+								articleTypeStyles[articleType],
+							]}
+							data-article-filter={articleType}
+							aria-pressed="false"
+						>
+							{articleTypeLabels[articleType] ?? articleType}
+						</button>
+					))}
+				</div>
+				<button type="button" class="shrink-0 self-start text-xs font-medium uppercase tracking-[0.12em] text-muted transition-colors hover:text-ink" data-clear-article-filters>
+					Limpiar
+				</button>
+			</div>
+			<ArticleList posts={posts} />
+		</section>
+	</ContentGrid>
+
+	<script>
+		const library = document.querySelector<HTMLElement>('[data-article-library]');
+
+		if (library) {
+			const filterButtons = Array.from(library.querySelectorAll<HTMLButtonElement>('[data-article-filter]'));
+			const clearButton = library.querySelector<HTMLButtonElement>('[data-clear-article-filters]');
+			const cards = Array.from(library.querySelectorAll<HTMLElement>('[data-article-type]'));
+			const active = new Set<string>();
+
+			const applyFilters = () => {
+				filterButtons.forEach((button) => {
+					const isActive = active.has(button.dataset.articleFilter ?? '');
+					button.dataset.active = String(isActive);
+					button.setAttribute('aria-pressed', String(isActive));
+				});
+
+				cards.forEach((card) => {
+					const type = card.dataset.articleType;
+					card.toggleAttribute('hidden', active.size > 0 && !active.has(type ?? ''));
+				});
+			};
+
+			filterButtons.forEach((button) => {
+				button.addEventListener('click', () => {
+					const articleType = button.dataset.articleFilter;
+					if (!articleType) return;
+					active.has(articleType) ? active.delete(articleType) : active.add(articleType);
+					applyFilters();
+				});
+			});
+
+			clearButton?.addEventListener('click', () => {
+				active.clear();
+				applyFilters();
+			});
+		}
+	</script>
 </Layout>

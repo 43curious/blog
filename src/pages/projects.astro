@@ -1,9 +1,12 @@
 ---
-import PageHero from '../components/PageHero.astro';
+import ContentGrid from '../components/ContentGrid.astro';
+import PageHeader from '../components/PageHeader.astro';
 import Layout from '../layouts/Layout.astro';
 import { SITE_TITLE } from '../consts';
 ---
 
-<Layout title={`Projects | ${SITE_TITLE}`} description="Projects and experiments.">
-	<PageHero eyebrow="Projects" title="Projects" description="A minimal list of projects and experiments." />
+<Layout title={`Proyectos | ${SITE_TITLE}`} description="Proyectos y experimentos.">
+	<ContentGrid>
+		<PageHeader eyebrow="Trabajo" title="Proyectos" description="Proyectos y experimentos." />
+	</ContentGrid>
 </Layout>

@@ -1,6 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import ArticleRow from './ArticleRow.astro';
+import ArticleCard from './ArticleCard.astro';
 
 interface Props {
 	posts: CollectionEntry<'blog'>[];
@@ -9,6 +9,6 @@ interface Props {
 const { posts } = Astro.props;
 ---
 
-<section class="article-list mt-4" aria-label="Articles">
-	{posts.map((post) => <ArticleRow post={post} />)}
-</section>
+<div id="article-list" class="mt-6 border-t border-line">
+	{posts.map((post) => <ArticleCard post={post} />)}
+</div>

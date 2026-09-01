@@ -1,5 +1,6 @@
 ---
 import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import { SITE_DESCRIPTION } from '../consts';
 
@@ -13,16 +14,19 @@ const { title, description = SITE_DESCRIPTION, class: className = '' } = Astro.p
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="es">
 	<head>
 		<BaseHead title={title} description={description} />
 	</head>
-	<body class="bg-paper">
-		<div class="mx-auto flex max-w-7xl flex-col gap-8 px-4 pt-6 lg:flex-row lg:px-0 lg:pt-12">
+	<body class="flex min-h-dvh flex-col bg-paper">
+		<div class="mx-4 mt-4 flex w-auto flex-1 flex-col gap-6 md:mx-8 md:mt-20 md:flex-row md:gap-0 lg:mx-20 lg:mt-20">
 			<Header />
-			<main class:list={['min-w-0 flex-1', className]}>
+			<main class:list={['min-w-0 flex-1 md:w-[calc(100%_-_200px)] md:flex-none', className]}>
 				<slot />
 			</main>
+		</div>
+		<div class="mx-4 mt-20 flex w-auto flex-col gap-6 pb-10 md:mx-8 md:flex-row md:gap-0 lg:mx-20 lg:pb-12">
+			<Footer />
 		</div>
 	</body>
 </html>

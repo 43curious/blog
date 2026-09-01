@@ -1,0 +1,25 @@
+---
+interface Props {
+	title: string;
+	description?: string;
+	eyebrow?: string;
+}
+
+const { title, description, eyebrow } = Astro.props;
+const hasEyebrow = Astro.slots.has('eyebrow');
+---
+
+<header class="mb-10 border-b border-line pb-8">
+	{(hasEyebrow || eyebrow) && (
+		<p class="text-xs font-medium uppercase tracking-[0.1em] text-muted">
+			{hasEyebrow ? <slot name="eyebrow" /> : eyebrow}
+		</p>
+	)}
+	<h1 class:list={[
+		"font-[-apple-system,BlinkMacSystemFont,'SF_Pro_Display','SF_Pro_Text','Helvetica_Neue',Arial,sans-serif] text-2xl font-bold leading-none tracking-normal text-ink md:text-5xl",
+		{ 'mt-4': hasEyebrow || eyebrow },
+	]}>
+		{title}
+	</h1>
+	{description && <p class="mt-2 max-w-[58ch] text-xl leading-8 text-muted md:text-2xl md:leading-9">{description}</p>}
+</header>
