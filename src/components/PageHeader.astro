@@ -9,7 +9,7 @@ const { title, description, eyebrow } = Astro.props;
 const hasEyebrow = Astro.slots.has('eyebrow');
 ---
 
-<header class="mb-10 border-b border-line pb-8">
+<header class="mb-10 pb-8">
 	{(hasEyebrow || eyebrow) && (
 		<p class="text-xs font-medium uppercase tracking-[0.1em] text-muted">
 			{hasEyebrow ? <slot name="eyebrow" /> : eyebrow}

@@ -32,7 +32,7 @@ const { title, description, pubDate, updatedDate, headings = [] } = Astro.props;
 		</article>
 
 		{headings.length > 0 && (
-			<aside slot="aside" class="self-start md:sticky md:top-20" aria-label="Tabla de contenidos">
+			<aside slot="aside" class="self-start lg:sticky lg:top-20" aria-label="Tabla de contenidos">
 				<nav>
 					<ol>
 						{headings.map((heading) => (

@@ -29,7 +29,7 @@ const articleTypeStyles: Record<string, string> = {
 		/>
 
 		<section aria-label="Artículos del blog" data-article-library>
-			<div class="flex flex-col items-stretch gap-3 md:flex-row md:items-start md:justify-between md:gap-6">
+			<div class="flex flex-col justify-between gap-3 md:flex-row md:items-start md:justify-between md:gap-6">
 				<div class="-mx-1 flex snap-x snap-proximity flex-nowrap gap-x-5 gap-y-2 overflow-x-auto overscroll-x-contain px-1 pb-1 [scrollbar-width:none] [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden md:mx-0 md:flex-wrap md:overflow-visible md:px-0 md:pb-0" aria-label="Filtrar artículos">
 					{articleTypes.map((articleType) => (
 						<button

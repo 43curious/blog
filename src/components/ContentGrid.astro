@@ -2,11 +2,11 @@
 const hasAside = Astro.slots.has('aside');
 ---
 
-<div class="grid w-full gap-12 md:grid-cols-[minmax(0,3fr)_minmax(0,1fr)] md:gap-0">
+<div class="grid w-full gap-12 lg:grid-cols-[minmax(0,3fr)_minmax(0,1fr)] lg:gap-0">
 	<div class="min-w-0">
 		<slot />
 	</div>
-	<div class="min-w-0 md:pl-4" aria-hidden={!hasAside}>
+	<div class="hidden min-w-0 lg:block lg:pl-4" aria-hidden={!hasAside}>
 		<slot name="aside" />
 	</div>
 </div>

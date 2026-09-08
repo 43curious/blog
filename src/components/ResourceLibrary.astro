@@ -23,50 +23,41 @@ const categoryLabels: Record<string, string> = {
 	motion: 'Motion',
 	youtube: 'YouTube',
 };
-const categoryStyles: Record<string, { filter: string; accent: string; text: string }> = {
+const categoryStyles: Record<string, { filter: string; text: string }> = {
 	utilidades: {
 		filter: 'text-[#8f2cff] hover:bg-[#8f2cff] data-[active=true]:bg-[#8f2cff]',
-		accent: 'before:bg-[#8f2cff]',
 		text: 'text-[#8f2cff]',
 	},
 	musica: {
 		filter: 'text-[#d9480f] hover:bg-[#d9480f] data-[active=true]:bg-[#d9480f]',
-		accent: 'before:bg-[#d9480f]',
 		text: 'text-[#d9480f]',
 	},
 	frames: {
 		filter: 'text-[#0077ff] hover:bg-[#0077ff] data-[active=true]:bg-[#0077ff]',
-		accent: 'before:bg-[#0077ff]',
 		text: 'text-[#0077ff]',
 	},
 	tipografias: {
 		filter: 'text-[#008f5a] hover:bg-[#008f5a] data-[active=true]:bg-[#008f5a]',
-		accent: 'before:bg-[#008f5a]',
 		text: 'text-[#008f5a]',
 	},
 	color: {
 		filter: 'text-[#b08900] hover:bg-[#b08900] data-[active=true]:bg-[#b08900]',
-		accent: 'before:bg-[#b08900]',
 		text: 'text-[#b08900]',
 	},
 	stock: {
 		filter: 'text-[#d63384] hover:bg-[#d63384] data-[active=true]:bg-[#d63384]',
-		accent: 'before:bg-[#d63384]',
 		text: 'text-[#d63384]',
 	},
 	diseno: {
 		filter: 'text-[#0ca678] hover:bg-[#0ca678] data-[active=true]:bg-[#0ca678]',
-		accent: 'before:bg-[#0ca678]',
 		text: 'text-[#0ca678]',
 	},
 	motion: {
 		filter: 'text-[#7048e8] hover:bg-[#7048e8] data-[active=true]:bg-[#7048e8]',
-		accent: 'before:bg-[#7048e8]',
 		text: 'text-[#7048e8]',
 	},
 	youtube: {
 		filter: 'text-[#e03131] hover:bg-[#e03131] data-[active=true]:bg-[#e03131]',
-		accent: 'before:bg-[#e03131]',
 		text: 'text-[#e03131]',
 	},
 };
@@ -104,40 +95,27 @@ const categoryStyles: Record<string, { filter: string; accent: string; text: str
 </section>
 
 <section class="mt-6 overflow-x-auto" aria-label="Recursos audiovisuales">
-	<table class="w-full min-w-[36rem] table-fixed border-collapse text-left">
-		<colgroup>
-			<col class="w-9/12" />
-			<col class="w-3/12" />
-		</colgroup>
-		<thead class="border-b border-line text-xs uppercase tracking-[0.1em] text-muted">
-			<tr>
-				<th scope="col" class="px-4 py-3 font-bold">Enlace</th>
-				<th scope="col" class="px-4 py-3 text-right font-bold">Categoría</th>
-			</tr>
-		</thead>
-		<tbody>
-			{resources.map((resource) => (
-				<tr class="resource-row border-b border-line transition-colors duration-150 hover:bg-soft" data-category={resource.category} data-paid={resource.star ? 'true' : 'false'}>
-					<td class="px-4 py-4 align-top text-sm leading-6">
-						<a
-							href={resource.url}
-							class="group inline"
-							target="_blank"
-							rel="noreferrer"
-						>
-							<span class:list={[
-								'relative isolate inline-block w-fit overflow-hidden px-[0.15em] font-semibold uppercase tracking-[0.08em] before:absolute before:inset-0 before:-z-10 before:origin-left before:scale-x-0 before:transition-transform before:duration-150 group-hover:text-paper group-hover:before:scale-x-100 group-focus-visible:text-paper group-focus-visible:before:scale-x-100',
-								categoryStyles[resource.category].accent,
-							]}>{resource.name}</span>
-						</a>
-					</td>
-					<td class="px-4 py-4 text-right align-top text-sm leading-6">
-						<span class={categoryStyles[resource.category].text}>{categoryLabels[resource.category] ?? resource.category}{resource.star && <span> · $</span>}</span>
-					</td>
-				</tr>
-			))}
-		</tbody>
-	</table>
+	<div class="min-w-[36rem] border-t border-line">
+		<div class="grid grid-cols-[minmax(0,3fr)_minmax(0,1fr)] border-b border-line py-3 text-xs uppercase tracking-[0.1em] text-muted" aria-hidden="true">
+			<span class="font-bold">Enlace</span>
+			<span class="text-right font-bold">Categoría</span>
+		</div>
+		{resources.map((resource) => (
+			<a
+				href={resource.url}
+				class="resource-row grid grid-cols-[minmax(0,3fr)_minmax(0,1fr)] items-baseline border-b border-line py-4 text-sm leading-6 transition-colors duration-150 hover:bg-soft"
+				data-category={resource.category}
+				data-paid={resource.star ? 'true' : 'false'}
+				target="_blank"
+				rel="noreferrer"
+			>
+				<span class="font-semibold uppercase tracking-[0.08em]">{resource.name}</span>
+				<span class:list={['text-right', categoryStyles[resource.category].text]}>
+					{categoryLabels[resource.category] ?? resource.category}{resource.star && <span> · $</span>}
+				</span>
+			</a>
+		))}
+	</div>
 </section>
 
 

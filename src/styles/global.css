@@ -11,6 +11,42 @@
 	--color-focus: #4137ff;
 }
 
+:root {
+	color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+	html:not(.light) {
+		color-scheme: dark;
+		--color-paper: #121214;
+		--color-ink: #f4f4f5;
+		--color-muted: #92918d;
+		--color-line: rgba(255, 255, 255, 0.12);
+		--color-soft: #1e1e22;
+		--color-focus: #6c63ff;
+	}
+}
+
+html.dark {
+	color-scheme: dark;
+	--color-paper: #121214;
+	--color-ink: #f4f4f5;
+	--color-muted: #92918d;
+	--color-line: rgba(255, 255, 255, 0.12);
+	--color-soft: #1e1e22;
+	--color-focus: #6c63ff;
+}
+
+html.light {
+	color-scheme: light;
+	--color-paper: #ffffff;
+	--color-ink: #000;
+	--color-muted: #6f6d69;
+	--color-line: #3629001f;
+	--color-soft: #ebe9df;
+	--color-focus: #4137ff;
+}
+
 @layer base {
 	html {
 		scrollbar-gutter: stable both-edges;
@@ -18,7 +54,7 @@
 	}
 
 	body {
-		@apply min-h-dvh bg-white font-sans text-base leading-6;
+		@apply min-h-dvh bg-paper font-sans text-base leading-6;
 	}
 
 	:focus-visible {
@@ -255,4 +291,107 @@
 	.prose .footnotes {
 		@apply mt-12 border-t border-line pt-6 text-sm text-muted;
 	}
+}
+
+/* Dark mode and theme switch overrides */
+@media (prefers-color-scheme: dark) {
+	html:not(.light) pre {
+		background-color: #16161a !important;
+		color: #e4e4e7 !important;
+		box-shadow: none !important;
+	}
+	html:not(.light) .prose pre code {
+		filter: invert(0.92) hue-rotate(180deg);
+	}
+	html:not(.light) .prose img {
+		background-color: var(--color-paper);
+	}
+	html:not(.light) .prose kbd {
+		background-color: var(--color-soft);
+		color: var(--color-ink);
+	}
+	html:not(.light) .prose mark {
+		background-color: #4d3e00;
+		color: #ffe670;
+	}
+	html:not(.light) .prose tr:hover td {
+		background-color: rgba(255, 255, 255, 0.05);
+	}
+	html:not(.light) header summary,
+	html:not(.light) header nav {
+		background-color: var(--color-paper);
+	}
+	html:not(.light) .chart,
+	html:not(.light) .chart-toggle [data-toggle-indicator] {
+		background-color: var(--color-paper);
+	}
+	html:not(.light) .chart-tooltip {
+		background-color: var(--color-soft);
+		color: var(--color-ink);
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+	}
+	html:not(.light) .theme-indicator {
+		transform: translateX(100%);
+	}
+	html:not(.light) .theme-label-light {
+		color: var(--color-muted);
+	}
+	html:not(.light) .theme-label-dark {
+		color: var(--color-ink);
+	}
+}
+
+html.dark pre {
+	background-color: #16161a !important;
+	color: #e4e4e7 !important;
+	box-shadow: none !important;
+}
+html.dark .prose pre code {
+	filter: invert(0.92) hue-rotate(180deg);
+}
+html.dark .prose img {
+	background-color: var(--color-paper);
+}
+html.dark .prose kbd {
+	background-color: var(--color-soft);
+	color: var(--color-ink);
+}
+html.dark .prose mark {
+	background-color: #4d3e00;
+	color: #ffe670;
+}
+html.dark .prose tr:hover td {
+	background-color: rgba(255, 255, 255, 0.05);
+}
+html.dark header summary,
+html.dark header nav {
+	background-color: var(--color-paper);
+}
+html.dark .chart,
+html.dark .chart-toggle [data-toggle-indicator] {
+	background-color: var(--color-paper);
+}
+html.dark .chart-tooltip {
+	background-color: var(--color-soft);
+	color: var(--color-ink);
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+html.dark .theme-indicator {
+	transform: translateX(100%);
+}
+html.dark .theme-label-light {
+	color: var(--color-muted);
+}
+html.dark .theme-label-dark {
+	color: var(--color-ink);
+}
+
+html.light .theme-indicator {
+	transform: translateX(0);
+}
+html.light .theme-label-light {
+	color: var(--color-ink);
+}
+html.light .theme-label-dark {
+	color: var(--color-muted);
 }

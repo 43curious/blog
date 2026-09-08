@@ -119,21 +119,35 @@ const animatedDataLayerClass = animateOnScroll
 ---
 
 <figure class="chart group/chart my-10 max-w-3xl border border-line bg-white p-4" data-chart data-chart-mode={mode} data-x-label={xLabel} data-y-label={yLabel} data-toggle-state={initialToggleState} data-has-toggle={toggle ? true : undefined} data-animate-on-scroll={animateOnScroll ? true : undefined} aria-label={title ?? 'Gráfico'}>
-	<div class="mb-3 flex items-baseline justify-between gap-4">
-		{title && <figcaption class="m-0 font-sans text-[0.68rem] font-bold uppercase tracking-[0.14em]">{title}</figcaption>}
-		{toggle && (
-			<button
-				type="button"
-				class="chart-toggle relative grid min-w-40 cursor-pointer grid-cols-2 border border-line bg-soft p-[0.1rem] font-sans text-[0.68rem] uppercase tracking-[0.08em]"
-				data-chart-toggle
-				aria-label="Cambiar estado del gráfico"
-				aria-pressed={initialToggleState === 1}
-			>
-				<span class:list={['pointer-events-none absolute inset-y-[0.2rem] left-[0.2rem] w-[calc(50%_-_0.2rem)] border border-line bg-white transition-transform duration-150', { 'translate-x-full': initialToggleState === 1 }]} data-toggle-indicator></span>
-				<span class:list={['relative z-10 px-2 py-[0.35rem] text-center transition-colors duration-150', initialToggleState === 0 ? 'font-bold text-ink' : 'text-muted']} data-toggle-option="0">{toggle.labels[0] ?? 'A'}</span>
-				<span class:list={['relative z-10 px-2 py-[0.35rem] text-center transition-colors duration-150', initialToggleState === 1 ? 'font-bold text-ink' : 'text-muted']} data-toggle-option="1">{toggle.labels[1] ?? 'B'}</span>
-			</button>
-		)}
+	<div class="mb-3 flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
+		{title && <figcaption class="m-0 font-sans text-[0.68rem] font-bold uppercase tracking-[0.14em] text-ink">{title}</figcaption>}
+		<div class="ml-auto flex flex-wrap items-center gap-x-5 gap-y-2">
+			{toggle && (
+				<button
+					type="button"
+					class="chart-toggle relative grid min-w-40 cursor-pointer grid-cols-2 border border-line bg-soft p-[0.1rem] font-sans text-[0.68rem] uppercase tracking-[0.08em]"
+					data-chart-toggle
+					aria-label="Cambiar estado del gráfico"
+					aria-pressed={initialToggleState === 1}
+				>
+					<span class:list={['pointer-events-none absolute inset-y-[0.2rem] left-[0.2rem] w-[calc(50%_-_0.2rem)] border border-line bg-white transition-transform duration-150', { 'translate-x-full': initialToggleState === 1 }]} data-toggle-indicator></span>
+					<span class:list={['relative z-10 px-2 py-[0.35rem] text-center transition-colors duration-150', initialToggleState === 0 ? 'font-bold text-ink' : 'text-muted']} data-toggle-option="0">{toggle.labels[0] ?? 'A'}</span>
+					<span class:list={['relative z-10 px-2 py-[0.35rem] text-center transition-colors duration-150', initialToggleState === 1 ? 'font-bold text-ink' : 'text-muted']} data-toggle-option="1">{toggle.labels[1] ?? 'B'}</span>
+				</button>
+			)}
+			<ul class="m-0 flex list-none flex-wrap items-center gap-x-4 gap-y-1.5 p-0" aria-label="Leyenda">
+				{seriesMeta.map((item) => (
+					<li>
+						<button type="button" class:list={['chart-legend-item inline-flex cursor-pointer items-center gap-[0.45rem] p-0 font-sans text-[0.68rem] uppercase tracking-[0.08em] transition-[opacity,filter] duration-150', { 'hidden': toggle && (item.state ?? 0) !== initialToggleState }]} data-series={item.id} data-toggle-state={item.state ?? 0}>
+							<svg class="h-[0.65rem] w-[0.65rem] flex-none" viewBox="0 0 1 1" aria-hidden="true">
+								<rect width="1" height="1" fill={item.color} />
+							</svg>
+							{item.label}
+						</button>
+					</li>
+				))}
+			</ul>
+		</div>
 	</div>
 	<div class="relative overflow-x-auto">
 		<svg class="block h-auto w-full min-w-[34rem]" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={title ?? 'Gráfico'}>
@@ -144,13 +158,13 @@ const animatedDataLayerClass = animateOnScroll
 			<line x1={padding.left} x2={width - padding.right} y1={height - padding.bottom} y2={height - padding.bottom} class="stroke-ink [stroke-width:1]" />
 
 			{yTicks.map((tick) => (
-				<text x={padding.left - 10} y={scaleY(tick) + 4} text-anchor="end" class="fill-muted font-sans text-[10px]">{formatValue(tick)}</text>
+				<text x={padding.left - 10} y={scaleY(tick) + 4} text-anchor="end" class="fill-muted font-mono text-[10px]">{formatValue(tick)}</text>
 			))}
 
 			{isBar ? (
 				<>
 					{categories.map((category, categoryIndex) => (
-						<text x={padding.left + categoryWidth * categoryIndex + categoryWidth / 2} y={height - padding.bottom + 24} text-anchor="middle" class="fill-muted font-sans text-[10px]">{category}</text>
+						<text x={padding.left + categoryWidth * categoryIndex + categoryWidth / 2} y={height - padding.bottom + 24} text-anchor="middle" class="fill-muted font-mono text-[10px]">{category}</text>
 					))}
 					<g class:list={['chart-data-layer', animatedDataLayerClass]}>
 					{barSeries.map((item, seriesIndex) => (
@@ -177,19 +191,40 @@ const animatedDataLayerClass = animateOnScroll
 			) : (
 				<>
 					{xTicks.map((tick) => (
-						<text x={scaleX(tick)} y={height - padding.bottom + 24} text-anchor="middle" class="fill-muted font-sans text-[10px]">{formatValue(tick)}</text>
+						<text x={scaleX(tick)} y={height - padding.bottom + 24} text-anchor="middle" class="fill-muted font-mono text-[10px]">{formatValue(tick)}</text>
 					))}
 					<g class:list={['chart-data-layer', animatedDataLayerClass]}>
 					{plottedSeries.map((item) => (
 						<g class:list={['chart-series outline-none transition-[opacity,filter] duration-150', { 'hidden': toggle && (item.state ?? 0) !== initialToggleState }]} data-series={item.id} data-toggle-state={item.state ?? 0} tabindex="0" role="img" aria-label={item.label}>
-							{mode !== 'scatter' && <path d={pathFor(item.points)} fill="none" stroke={item.color} class="chart-line [stroke-width:1] transition-[stroke-width] duration-150" />}
+							{mode !== 'scatter' && (
+								<>
+									<path
+										d={pathFor(item.points)}
+										fill="none"
+										stroke="transparent"
+										stroke-width="16"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										style="pointer-events: stroke;"
+									/>
+									<path
+										d={pathFor(item.points)}
+										fill="none"
+										stroke={item.color}
+										class="chart-line [stroke-width:1] transition-[stroke-width] duration-150"
+									/>
+								</>
+							)}
 							{(mode === 'line' || mode === 'scatter') && showPoints && item.points.map((point) => (
 								<circle
 									cx={scaleX(point.x)}
 									cy={scaleY(point.y)}
 									r="3"
 									fill={item.color}
-									class:list={['chart-point transition-[r] duration-150', { '[r:5px]': mode === 'scatter' }]}
+									stroke="transparent"
+									stroke-width="10"
+									style="pointer-events: all;"
+									class:list={['chart-point stroke-[10px] [paint-order:stroke_fill] transition-[r] duration-150', { '[r:5px]': mode === 'scatter' }]}
 									data-chart-point={showTooltip ? true : undefined}
 									data-label={item.label}
 									data-point-label={point.label}
@@ -208,20 +243,8 @@ const animatedDataLayerClass = animateOnScroll
 			{xLabel && <text x={padding.left + plotWidth / 2} y={height - 8} text-anchor="middle" class="fill-muted font-sans text-[11px]">{xLabel}</text>}
 			{yLabel && <text x="14" y={padding.top + plotHeight / 2} text-anchor="middle" transform={`rotate(-90 14 ${padding.top + plotHeight / 2})`} class="fill-muted font-sans text-[11px]">{yLabel}</text>}
 		</svg>
-		{showTooltip && <div class="chart-tooltip pointer-events-none fixed z-20 max-w-72 translate-x-3 translate-y-3 whitespace-pre-line border border-line bg-white px-[0.8rem] py-[0.65rem] font-sans text-[0.68rem] leading-[1.4] text-ink shadow-[0_8px_24px_rgb(0_0_0/0.12)] [overflow-wrap:anywhere]" data-chart-tooltip role="status" aria-live="polite" hidden></div>}
+		{showTooltip && <div class="chart-tooltip pointer-events-none fixed z-20 max-w-72 whitespace-pre-line border border-line bg-white px-[0.8rem] py-[0.65rem] font-sans text-[0.68rem] leading-[1.4] text-ink shadow-[0_8px_24px_rgb(0_0_0/0.12)] [overflow-wrap:anywhere]" data-chart-tooltip role="status" aria-live="polite" hidden></div>}
 	</div>
-	<ul class="mt-4 flex list-none flex-wrap gap-x-5 gap-y-3 p-0" aria-label="Leyenda">
-		{seriesMeta.map((item) => (
-			<li>
-				<button type="button" class:list={['chart-legend-item inline-flex cursor-pointer items-center gap-[0.45rem] p-0 font-sans text-[0.68rem] uppercase tracking-[0.08em] transition-[opacity,filter] duration-150', { 'hidden': toggle && (item.state ?? 0) !== initialToggleState }]} data-series={item.id} data-toggle-state={item.state ?? 0}>
-					<svg class="h-[0.65rem] w-[0.65rem] flex-none" viewBox="0 0 1 1" aria-hidden="true">
-						<rect width="1" height="1" fill={item.color} />
-					</svg>
-					{item.label}
-				</button>
-			</li>
-		))}
-	</ul>
 </figure>
 
 <script>
@@ -234,30 +257,57 @@ const animatedDataLayerClass = animateOnScroll
 		const toggleButton = chart.querySelector('[data-chart-toggle]');
 		const toggleIndicator = chart.querySelector('[data-toggle-indicator]');
 		const toggleOptions = Array.from(chart.querySelectorAll('[data-toggle-option]'));
-		const setHighlight = (id) => {
+		const svg = chart.querySelector('svg');
+
+		let currentHighlight: string | null = null;
+		let highlightTimer: any = null;
+
+		const setHighlight = (id: string) => {
+			if (highlightTimer) {
+				clearTimeout(highlightTimer);
+				highlightTimer = null;
+			}
+			if (currentHighlight === id) return;
+			currentHighlight = id;
+
 			objects.forEach((object) => {
 				const match = object.dataset.series === id;
 				object.classList.toggle('opacity-[0.16]', !match);
 				object.querySelectorAll('.chart-line').forEach((line) => {
 					line.classList.toggle('[stroke-width:1]', !match);
-					line.classList.toggle('[stroke-width:3]', match);
+					line.classList.toggle('[stroke-width:2.5]', match);
 				});
 				if (chart.dataset.chartMode !== 'scatter') {
-					object.querySelectorAll('.chart-point').forEach((point) => point.classList.toggle('[r:4px]', match));
+					object.querySelectorAll('.chart-point').forEach((point) => point.classList.toggle('[r:4.5px]', match));
 				}
 				object.querySelectorAll('.chart-bar').forEach((bar) => bar.classList.toggle('brightness-85', match));
 			});
 		};
+
 		const clearHighlight = () => {
+			if (highlightTimer) {
+				clearTimeout(highlightTimer);
+				highlightTimer = null;
+			}
+			if (!currentHighlight) return;
+			currentHighlight = null;
+
 			objects.forEach((object) => {
 				object.classList.remove('opacity-[0.16]');
 				object.querySelectorAll('.chart-line').forEach((line) => {
-					line.classList.remove('[stroke-width:3]');
+					line.classList.remove('[stroke-width:2.5]');
 					line.classList.add('[stroke-width:1]');
 				});
-				object.querySelectorAll('.chart-point').forEach((point) => point.classList.remove('[r:4px]'));
+				object.querySelectorAll('.chart-point').forEach((point) => point.classList.remove('[r:4.5px]'));
 				object.querySelectorAll('.chart-bar').forEach((bar) => bar.classList.remove('brightness-85'));
 			});
+		};
+
+		const scheduleClearHighlight = () => {
+			if (highlightTimer) clearTimeout(highlightTimer);
+			highlightTimer = setTimeout(() => {
+				clearHighlight();
+			}, 75);
 		};
 
 		if (toggleButton) {
@@ -285,17 +335,38 @@ const animatedDataLayerClass = animateOnScroll
 		}
 
 		objects.forEach((object) => {
-			object.addEventListener('pointerenter', () => setHighlight(object.dataset.series));
-			object.addEventListener('pointerleave', clearHighlight);
-			object.addEventListener('focus', () => setHighlight(object.dataset.series));
+			object.addEventListener('pointerenter', () => setHighlight(object.dataset.series ?? ''));
+			object.addEventListener('pointerleave', scheduleClearHighlight);
+			object.addEventListener('focus', () => setHighlight(object.dataset.series ?? ''));
 			object.addEventListener('blur', clearHighlight);
 		});
 
+		svg?.addEventListener('pointerleave', scheduleClearHighlight);
+
 		if (tooltip) {
+			let tooltipTimer: any = null;
+
+			const cancelHideTooltip = () => {
+				if (tooltipTimer) {
+					clearTimeout(tooltipTimer);
+					tooltipTimer = null;
+				}
+			};
+
 			const hideTooltip = () => {
+				cancelHideTooltip();
 				tooltip.hidden = true;
 			};
-			const tooltipText = (point) => {
+
+			const scheduleHideTooltip = () => {
+				if (tooltipTimer) clearTimeout(tooltipTimer);
+				tooltipTimer = setTimeout(() => {
+					tooltip.hidden = true;
+					tooltipTimer = null;
+				}, 75);
+			};
+
+			const tooltipText = (point: HTMLElement | SVGElement) => {
 				const xLabel = chart.dataset.xLabel ?? 'x';
 				const yLabel = chart.dataset.yLabel ?? 'y';
 				return [
@@ -305,9 +376,14 @@ const animatedDataLayerClass = animateOnScroll
 					`${yLabel}: ${point.dataset.y}`,
 				].filter(Boolean).join('\n');
 			};
-			const moveTooltip = (point, event) => {
+
+			const moveTooltip = (point: HTMLElement | SVGElement, event: MouseEvent | PointerEvent) => {
+				cancelHideTooltip();
+				const text = tooltipText(point);
+				if (tooltip.textContent !== text) {
+					tooltip.textContent = text;
+				}
 				tooltip.hidden = false;
-				tooltip.textContent = tooltipText(point);
 				const tooltipBox = tooltip.getBoundingClientRect();
 				const left = Math.min(event.clientX + 14, window.innerWidth - tooltipBox.width - 8);
 				const top = Math.min(event.clientY + 14, window.innerHeight - tooltipBox.height - 8);
@@ -318,13 +394,16 @@ const animatedDataLayerClass = animateOnScroll
 			points.forEach((point) => {
 				point.addEventListener('pointerenter', (event) => moveTooltip(point, event));
 				point.addEventListener('pointermove', (event) => moveTooltip(point, event));
-				point.addEventListener('pointerleave', hideTooltip);
+				point.addEventListener('pointerleave', scheduleHideTooltip);
 				point.addEventListener('focus', () => {
+					cancelHideTooltip();
 					tooltip.hidden = false;
 					tooltip.textContent = tooltipText(point);
 				});
 				point.addEventListener('blur', hideTooltip);
 			});
+
+			svg?.addEventListener('pointerleave', scheduleHideTooltip);
 		}
 	});
 
