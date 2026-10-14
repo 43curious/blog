@@ -88,7 +88,9 @@ const today = new Date();
 	document.addEventListener('astro:after-swap', initTheme);
 
 	mediaQuery.addEventListener('change', (e) => {
-		localStorage.removeItem('theme');
+		// Follow the system only until the visitor explicitly chooses a theme.
+		const storedTheme = localStorage.getItem('theme');
+		if (storedTheme === 'light' || storedTheme === 'dark') return;
 		applyTheme(e.matches ? 'dark' : 'light', false);
 	});
 
