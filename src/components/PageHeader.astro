@@ -3,9 +3,10 @@ interface Props {
 	title: string;
 	description?: string;
 	eyebrow?: string;
+	titleSize?: 'default' | 'small';
 }
 
-const { title, description, eyebrow } = Astro.props;
+const { title, description, eyebrow, titleSize = 'default' } = Astro.props;
 const hasEyebrow = Astro.slots.has('eyebrow');
 ---
 
@@ -16,7 +17,8 @@ const hasEyebrow = Astro.slots.has('eyebrow');
 		</p>
 	)}
 	<h1 class:list={[
-		"font-[-apple-system,BlinkMacSystemFont,'SF_Pro_Display','SF_Pro_Text','Helvetica_Neue',Arial,sans-serif] text-2xl font-bold leading-none tracking-normal text-ink md:text-5xl",
+		"font-[-apple-system,BlinkMacSystemFont,'SF_Pro_Display','SF_Pro_Text','Helvetica_Neue',Arial,sans-serif] font-bold leading-none tracking-normal text-ink",
+		titleSize === 'small' ? 'text-xl md:text-4xl' : 'text-2xl md:text-5xl',
 		{ 'mt-4': hasEyebrow || eyebrow },
 	]}>
 		{title}

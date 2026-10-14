@@ -1,63 +1,48 @@
-# Astro Starter Kit: Blog
+# Jon Castro
+
+Personal website with notes, resources, and projects about audiovisual work, design, and web tools. The site is written in Spanish and built with Astro, TypeScript, Tailwind CSS, and Markdown/MDX.
+
+## Development
+
+Requires Node.js 22.12.0 or newer.
 
 ```sh
-npm create astro@latest -- --template blog
+npm ci
+npm run dev
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+The development server runs at `http://localhost:4321`.
 
-Features:
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Start the development server |
+| `npm run build` | Generate the production site in `dist/` |
+| `npm run preview` | Preview the production build locally |
+| `npm run astro -- --help` | Show Astro CLI commands |
 
-- ✅ Minimal styling (make it your own!)
-- ✅ 100/100 Lighthouse performance
-- ✅ SEO-friendly with canonical URLs and Open Graph data
-- ✅ Sitemap support
-- ✅ RSS Feed support
-- ✅ Markdown & MDX support
-
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
+## Project structure
 
 ```text
-├── public/
-├── src/
-│   ├── assets/
-│   ├── components/
-│   ├── content/
-│   ├── layouts/
-│   └── pages/
-├── astro.config.mjs
-├── README.md
-├── package.json
-└── tsconfig.json
+public/               Static files and favicons
+src/assets/           Images processed by Astro
+src/components/       Shared UI, article lists, resource library, and charts
+src/content/blog/     Markdown and MDX articles
+src/layouts/          Page and article layouts
+src/pages/            Homepage, resources, projects, articles, and RSS feed
+src/styles/           Global styles and theme colors
+src/consts.ts         Site title and description
+src/content.config.ts Article frontmatter schema
+astro.config.mjs      Astro integrations and site URL
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+See [MAINTAINING.md](MAINTAINING.md) for adding articles, using charts in MDX, and checking the site before publishing.
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+## Publishing
 
-The `src/content/` directory contains "collections" of related Markdown and MDX documents. Use `getCollection()` to retrieve posts from `src/content/blog/`, and type-check your frontmatter using an optional schema. See [Astro's Content Collections docs](https://docs.astro.build/en/guides/content-collections/) to learn more.
+Set `site` in `astro.config.mjs` to the production URL before deploying; it currently uses `https://example.com`. This URL is used for canonical links, the sitemap, and RSS links.
 
-Any static assets, like images, can be placed in the `public/` directory.
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Check out [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+Run `npm run build` and deploy `dist/` to a static host. Generated output (`dist/`, `.astro/`) and dependencies (`node_modules/`) are ignored by Git.
 
 ## Credit
 
-This theme is based off of the lovely [Bear Blog](https://github.com/HermanMartinus/bearblog/).
+Originally based on the Astro blog starter and [Bear Blog](https://github.com/HermanMartinus/bearblog/).

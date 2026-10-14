@@ -1,5 +1,4 @@
-// Place any global data in this file.
-// You can import this data from anywhere in your site by using the `import` keyword.
+// Shared site metadata used by pages, social previews, and the RSS feed.
 
-export const SITE_TITLE = 'Pool Notes';
+export const SITE_TITLE = 'Jon Castro';
 export const SITE_DESCRIPTION = 'Notas, recursos y artículos sobre trabajo audiovisual.';
