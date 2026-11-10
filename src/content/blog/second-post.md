@@ -1,6 +1,6 @@
 ---
-title: 'Second post'
-description: 'Lorem ipsum dolor sit amet'
+title: 'Mi configuración de macOS'
+description: 'Un entorno de trabajo sencillo con Homebrew, zsh, Ghostty, Neovim y AeroSpace.'
 pubDate: 'Jul 15 2022'
 articleType: 'guides'
 heroImage: '../../assets/blog-placeholder-4.jpg'

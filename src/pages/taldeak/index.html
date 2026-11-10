@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="eu">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="description" content="Esperientzien azokako taldeen banaketa, guneak eta bost txandak." />
+<link rel="canonical" href="https://castro.eus/taldeak/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<title>Esperientzien azoka · Txandakatzeak</title>
+<style>
+:root {
+ color-scheme: light;
+ --bg: #fff;
+ --text: #000;
+ --muted: #6f6d69;
+ --edge: #3629001f;
+ --soft: #f7f7f5;
+ --focus: #4137ff;
+ --t: #8e2945;
+ --r: #7951b7;
+ --n: #227957;
+ --a: #292929;
+ --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+ margin: 0;
+ background: var(--bg);
+ color: var(--text);
+ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+ -webkit-font-smoothing: antialiased;
+ line-height: 1.5;
+}
+::selection { background: #9b9bfe; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 4px; }
+main {
+ max-width: 1440px;
+ min-height: 100svh;
+ margin: auto;
+ padding: 48px 64px 28px;
+ display: flex;
+ flex-direction: column;
+}
+header { padding-bottom: 32px; }
+.eyebrow { color: var(--muted); font-size: 11px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; }
+h1, h2 { font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif; }
+h1 { max-width: 800px; margin: 16px 0 12px; font-size: clamp(28px, 3.3vw, 46px); font-weight: 700; line-height: 1.1; letter-spacing: -.025em; text-wrap: balance; }
+p { margin: 0; color: var(--muted); }
+#subtitle { max-width: 62ch; font-size: 15px; }
+.progress { display: flex; gap: 5px; }
+.step { flex: 1; height: 2px; background: var(--edge); transition: background .2s; }
+.step.on { background: #aaa8a2; }
+.step.current { background: var(--text); }
+.maphead { display: flex; align-items: center; justify-content: space-between; padding-top: 20px; color: var(--muted); font-family: var(--mono); font-size: 10px; letter-spacing: .07em; text-transform: uppercase; }
+.stage { position: relative; flex: 1; min-height: 520px; max-height: 680px; overflow: hidden; isolation: isolate; }
+.station { position: absolute; top: 13%; width: 29%; height: 69%; border: 1px solid var(--edge); background: var(--soft); z-index: 0; transition: opacity .35s, transform .35s; }
+.station[data-station="T"] { left: 3%; }
+.station[data-station="N"] { left: 35.5%; }
+.station[data-station="A"] { left: 68%; }
+.stationtop { position: absolute; top: 20px; left: 20px; right: 20px; }
+.station h2 { margin: 0; font-size: clamp(15px, 1.5vw, 20px); font-weight: 600; line-height: 1.25; }
+.station .sub { margin-top: 6px; font-size: 11px; color: var(--muted); }
+.station .line { width: 24px; height: 2px; margin-top: 14px; }
+.station[data-station="T"] .line { background: var(--t); }
+.station[data-station="N"] .line { background: var(--n); }
+.station[data-station="A"] .line { background: var(--a); }
+.station .foot { position: absolute; bottom: 15px; left: 20px; right: 20px; padding-top: 12px; border-top: 1px solid var(--edge); font-family: var(--mono); color: var(--muted); font-size: 10px; }
+.dot { position: absolute; left: 50%; top: 50%; z-index: 2; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; color: #fff; font-family: var(--mono); font-size: 10px; font-weight: 500; transform: translate(-50%, -50%); transition: left 930ms cubic-bezier(.22,1,.36,1), top 930ms cubic-bezier(.22,1,.36,1); cursor: default; user-select: none; }
+.dot[data-team="T"] { background: var(--t); }
+.dot[data-team="R"] { background: var(--r); }
+.dot[data-team="N"] { background: var(--n); }
+.dot[data-team="A"] { background: var(--a); }
+.dot.fixed { outline: 1px solid var(--t); outline-offset: 3px; }
+.dot .tooltip { position: absolute; bottom: 45px; padding: 6px 9px; border: 1px solid var(--edge); background: var(--bg); color: var(--text); font: 11px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; white-space: nowrap; opacity: 0; transform: translateY(4px); transition: .15s; pointer-events: none; }
+.dot:hover { z-index: 10; }
+.dot:hover .tooltip { opacity: 1; transform: translateY(0); }
+.centerlabel { position: absolute; top: 8%; left: 50%; z-index: 1; width: 90%; text-align: center; transform: translateX(-50%); pointer-events: none; }
+.centerlabel .activity { display: block; margin-bottom: 8px; font-family: var(--mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.centerlabel h2 { margin: 0; font-size: 25px; font-weight: 500; letter-spacing: -.02em; }
+.centerlabel p { margin-top: 6px; font-size: 12px; }
+.offlabel { position: absolute; left: 3%; right: 3%; bottom: 54px; z-index: 1; font-size: 11px; text-align: center; color: var(--muted); }
+.offlabel strong { margin-left: 6px; font-family: var(--mono); color: var(--text); font-weight: 500; }
+.bottom { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; padding: 20px 0; border-top: 1px solid var(--edge); }
+.legend { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 20px; }
+.legenditem { display: flex; align-items: center; gap: 7px; font-size: 11px; color: var(--muted); }
+.swatch { width: 8px; height: 8px; border-radius: 50%; }
+.fixed-swatch { width: 12px; height: 12px; border: 1px solid var(--t); border-radius: 50%; }
+.nav { display: flex; align-items: center; gap: 8px; }
+button { min-height: 40px; padding: 10px 14px; border: 1px solid var(--edge); border-radius: 0; background: var(--bg); color: var(--text); font: 12px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; cursor: pointer; transition: background .15s; }
+button:hover:not(:disabled) { background: var(--soft); }
+button:disabled { opacity: .3; cursor: not-allowed; }
+button.primary { border-color: var(--text); background: var(--text); color: var(--bg); }
+button.primary:hover:not(:disabled) { background: #333; }
+#fullscreen { display: grid; place-items: center; width: 40px; padding: 0; margin-left: 4px; }
+#fullscreen svg { width: 15px; height: 15px; }
+.count { min-width: 52px; color: var(--muted); font-family: var(--mono); font-size: 11px; text-align: center; }
+.details { border-top: 1px solid var(--edge); border-bottom: 1px solid var(--edge); padding: 18px 0; }
+.details summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; font-size: 12px; cursor: pointer; list-style: none; }
+.details summary::-webkit-details-marker { display: none; }
+.details summary::after { content: '+'; font: 18px var(--mono); color: var(--muted); }
+.details[open] summary::after { content: '−'; }
+.details-body { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin: 24px 0 4px; }
+.details-body p { margin: 6px 0; font-size: 12px; }
+.details-body strong { font-size: 12px; font-weight: 600; }
+.details-body code { color: var(--text); font: 11px/1.8 var(--mono); }
+.hint { padding-top: 16px; color: var(--muted); font-size: 10px; }
+kbd { font: 10px var(--mono); }
+@media (min-width: 1600px) { main { padding-top: 64px; } }
+@media (max-width: 1000px) {
+ main { padding: 32px; }
+ .bottom { gap: 18px; }
+ .legend { gap: 10px 16px; }
+}
+@media (max-width: 600px) {
+ main { padding: 24px max(16px, env(safe-area-inset-right)) calc(92px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
+ header { padding-bottom: 24px; }
+ h1 { margin-top: 12px; font-size: clamp(27px, 7.5vw, 36px); }
+ #subtitle { font-size: 14px; }
+ .maphead { flex-wrap: wrap; gap: 6px 16px; padding-top: 16px; font-size: 9px; }
+ .stage { flex: none; height: 420px; min-height: 0; max-height: none; }
+ .stage[data-layout="round"] { height: 800px; }
+ .station { top: calc(16px + var(--station-index) * 232px); width: 100%; height: 216px; }
+ .station[data-station="T"] { left: 0; --station-index: 0; }
+ .station[data-station="N"] { left: 0; --station-index: 1; }
+ .station[data-station="A"] { left: 0; --station-index: 2; }
+ .stationtop { top: 16px; left: 16px; right: 16px; }
+ .station h2 { font-size: 17px; }
+ .station .sub { margin-top: 4px; font-size: 11px; }
+ .station .line { display: none; }
+ .station .foot { left: 16px; right: 16px; bottom: 12px; font-size: 10px; }
+ .dot { width: 28px; height: 28px; font-size: 9px; }
+ .stage[data-layout="round"] .dot { width: 34px; height: 34px; font-size: 10px; }
+ .dot.fixed { outline-offset: 2px; }
+ .centerlabel { top: 6%; }
+ .centerlabel h2 { font-size: 22px; }
+ .centerlabel p { font-size: 11px; }
+ .offlabel { left: 0; right: 0; bottom: 66px; font-size: 11px; text-align: left; }
+ .bottom { padding: 18px 0; }
+ .legend { gap: 12px 16px; }
+ .legenditem { font-size: 12px; }
+ .nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 20; gap: 6px; padding: 12px max(16px, env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); border-top: 1px solid var(--edge); background: var(--bg); }
+ .nav button { min-height: 44px; padding: 10px 8px; white-space: nowrap; }
+ #prev, #next { flex: 1; min-width: 0; }
+ .count { flex: 0 0 40px; min-width: 0; }
+ #fullscreen { flex: 0 0 44px; width: 44px; margin-left: 0; padding: 0; }
+ .details summary { min-height: 44px; font-size: 13px; }
+ .details-body { grid-template-columns: 1fr; gap: 16px; }
+ .details-body p, .details-body strong { font-size: 13px; }
+ .details-body code { font-size: 12px; }
+ .hint { line-height: 1.8; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
+</style>
+</head>
+<body>
+<main>
+ <header><div><div class="eyebrow">Proiektuen erakusketa · 20 parte-hartzaile</div><h1 id="title">Astronautak · Taldeko esperientzia</h1><p id="subtitle">Lau taldeek elkarrekin parte hartzen dute hasierako jardueran.</p></div></header>
+ <div id="progress" class="progress" aria-label="Aurkezpenaren aurrerapena"></div>
+ <div class="maphead"><span>Saioaren mapa</span><span>20 parte-hartzaile · 4 talde</span></div>
+ <div id="stage" class="stage" aria-label="Guneen eta parte-hartzaileen plano animatua">
+  <div id="centerlabel" class="centerlabel"><span class="activity">Hasierako jarduera</span><h2>Denok ontzira</h2><p>20 parte-hartzaile · Taldeko esperientzia bat</p></div>
+  <section class="station" data-station="T"><div class="stationtop"><h2>Tarotistak</h2><div class="sub">2 antzezle finko · 3 bisitari</div><div class="line"></div></div><div class="foot">Granatea · T1–T5</div></section>
+  <section class="station" data-station="N"><div class="stationtop"><h2>Ikertzaileak</h2><div class="sub">2 arduradun · 4 jokalari</div><div class="line"></div></div><div class="foot">Berdea · I1–I5</div></section>
+  <section class="station" data-station="A"><div class="stationtop"><h2>Antzezleak</h2><div class="sub">2 arduradun · 4 jokalari</div><div class="line"></div></div><div class="foot">Beltza · AN1–AN5</div></section>
+  <div id="offlabel" class="offlabel" hidden>Laguntza / atsedenaldia: <strong id="offname"></strong></div>
+ </div>
+ <div class="bottom"><div class="legend"><span class="legenditem"><span class="swatch" style="background:var(--t)"></span>Tarotistak</span><span class="legenditem"><span class="swatch" style="background:var(--r)"></span>Astronautak</span><span class="legenditem"><span class="swatch" style="background:var(--n)"></span>Ikertzaileak</span><span class="legenditem"><span class="swatch" style="background:var(--a)"></span>Antzezleak</span><span class="legenditem"><span class="fixed-swatch" aria-hidden="true"></span>Antzezle finkoa</span></div><div class="nav"><button id="prev" title="Ezkerreko gezia">← Aurrekoa</button><span id="count" class="count">1 / 7</span><button id="next" class="primary" title="Eskuineko gezia edo zuriune-barra">Hurrengoa →</button><button id="fullscreen" title="Pantaila osoa" aria-label="Pantaila osoa"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M7 3H3v4m10-4h4v4M3 13v4h4m10-4v4h-4"/></svg></button></div></div>
+ <details class="details"><summary>Ikusi pertsonen banaketa eta txandaren arauak</summary><div id="detailsBody" class="details-body"></div></details>
+ <div class="hint">Aurrera egiteko, erabili <kbd>←</kbd> <kbd>→</kbd> edo <kbd>zuriune-barra</kbd>. Koloreak taldea adierazten du; zenbakiak, pertsona.</div>
+</main>
+<script>
+// T1 eta T2 finkoak dira; gainerakoek beste taldeen gune guztiak bisitatzen dituzte.
+const rounds=[
+ {"T1":"T","T2":"T","T3":"O","T4":"A","T5":"O","N1":"N","N2":"N","N3":"T","N4":"A","N5":"O","A1":"A","A2":"N","A3":"A","A4":"N","A5":"T","R1":"A","R2":"N","R3":"N","R4":"A","R5":"T"},
+ {"T1":"T","T2":"T","T3":"O","T4":"O","T5":"A","N1":"A","N2":"A","N3":"N","N4":"N","N5":"T","A1":"T","A2":"A","A3":"N","A4":"A","A5":"N","R1":"N","R2":"A","R3":"O","R4":"T","R5":"N"},
+ {"T1":"T","T2":"T","T3":"N","T4":"A","T5":"N","N1":"N","N2":"T","N3":"A","N4":"T","N5":"N","A1":"N","A2":"T","A3":"A","A4":"O","A5":"A","R1":"O","R2":"O","R3":"A","R4":"N","R5":"A"},
+ {"T1":"T","T2":"T","T3":"A","T4":"N","T5":"A","N1":"T","N2":"N","N3":"N","N4":"O","N5":"A","A1":"A","A2":"N","A3":"N","A4":"A","A5":"O","R1":"T","R2":"T","R3":"N","R4":"A","R5":"O"},
+ {"T1":"T","T2":"T","T3":"N","T4":"O","T5":"O","N1":"A","N2":"A","N3":"A","N4":"N","N5":"N","A1":"N","A2":"A","A3":"T","A4":"T","A5":"A","R1":"N","R2":"N","R3":"T","R4":"O","R5":"A"}
+];
+const people=[...['T','N','A','R'].flatMap(team=>Array.from({length:5},(_,i)=>({id:team+(i+1),team,num:i+1})))];
+const names={T:'Tarotistak',N:'Ikertzaile nuklearrak',A:'Antzezleak',R:'Astronautak'};
+const prefixes={T:'T',N:'I',A:'AN',R:'AS'};
+const fixedTarotists=new Set(['T1','T2']);
+const hostsPerStation=2;
+const slides=[{title:'Astronautak · Taldeko esperientzia',sub:'Lau taldeek elkarrekin parte hartzen dute hasierako jardueran.',type:'intro'},
+ ...rounds.map((positions,i)=>({title:`Azoka · ${i+1}. txanda`,sub:i===0?'Azoka hasi da: hiru gune aldi berean.':'Ikusi nola mugitzen diren parte-hartzaileak hurrengo gunera.',type:'round',positions})),
+ {title:'Amaiera · Bateratze-saioa',sub:'Hausnarketa, iruzkinak eta taldeko ebaluazioa.',type:'finish'}];
+const stage=document.getElementById('stage');
+const mobileLayout=window.matchMedia('(max-width: 600px)');
+for(const p of people){const el=document.createElement('div');el.className='dot'+(fixedTarotists.has(p.id)?' fixed':'');el.dataset.team=p.team;el.setAttribute('aria-label',names[p.team]+' '+p.num);el.innerHTML=`<span>${prefixes[p.team]}${p.num}</span><span class="tooltip">${names[p.team]} ${p.num}${fixedTarotists.has(p.id)?' · finkoa':''}</span>`;stage.appendChild(el);p.el=el}
+let current=0;
+function setPosition(el,site,index,count){
+ let x,y;
+ if(site==='intro'||site==='finish'){
+  const angle=-Math.PI/2+(index*2*Math.PI/count);
+  const rx=mobileLayout.matches?stage.clientWidth*.38:Math.min(stage.clientWidth*.24,280);
+  const ry=Math.min(stage.clientHeight*.25,145);
+  x=50+Math.cos(angle)*rx/stage.clientWidth*100;
+  y=(mobileLayout.matches?63:60)+Math.sin(angle)*ry/stage.clientHeight*100;
+ }else if(mobileLayout.matches){
+  if(site==='O'){
+   x=(index+1)/(count+1)*100;
+   y=(stage.clientHeight-28)/stage.clientHeight*100;
+  }else{
+   const station=stage.querySelector(`[data-station="${site}"]`);
+   const hostCount=hostsPerStation;
+   const host=index<hostCount;
+   const column=host?index:index-hostCount;
+   const columns=host?hostCount:count-hostCount;
+   // Mugikorrean, parte-hartzaileak dagokien gunearen barruan kokatzen dira.
+   x=(station.offsetLeft+station.offsetWidth*(column+1)/(columns+1))/stage.clientWidth*100;
+   y=(station.offsetTop+(host?90:146))/stage.clientHeight*100;
+  }
+ }else if(site==='O'){
+  x=50+(index-(count-1)/2)*46/stage.clientWidth*100;
+  y=(stage.clientHeight-24)/stage.clientHeight*100;
+ }else{
+  const cx={T:17.5,N:50,A:82.5}[site];
+  // Arduradunak lehenik; bisitariak azpiko bi lerroetan.
+  const hostCount=hostsPerStation;
+  if(index<hostCount){x=cx+(index-(hostCount-1)/2)*9;y=38}
+  else {const v=index-hostCount;x=cx+(v%2===0?-1:1)*6.8;y=53+Math.floor(v/2)*11}
+ }
+ el.style.left=x+'%';el.style.top=y+'%';
+}
+function render(){const slide=slides[current];stage.dataset.layout=slide.type;document.getElementById('title').textContent=slide.title;document.getElementById('subtitle').textContent=slide.sub;document.getElementById('count').textContent=`${current+1} / ${slides.length}`;document.getElementById('prev').disabled=current===0;document.getElementById('next').disabled=current===slides.length-1;document.getElementById('progress').innerHTML=slides.map((_,i)=>`<span class="step ${i<current?'on':''} ${i===current?'current':''}"></span>`).join('');
+ const intro=slide.type==='intro',finish=slide.type==='finish';
+ const centerlabel=document.getElementById('centerlabel');
+ centerlabel.style.display=intro||finish?'block':'none';
+ centerlabel.querySelector('.activity').textContent=intro?'Hasierako jarduera':'Bateratze-saioa';
+ centerlabel.querySelector('h2').textContent=intro?'Denok ontzira':'Bizitakoa partekatu';
+ centerlabel.querySelector('p').textContent=intro?'20 parte-hartzaile · Taldeko esperientzia bat':'20 parte-hartzaile · Hausnarketa eta ebaluazioa';
+ document.querySelectorAll('.station').forEach(el=>{el.style.opacity=intro||finish?'0':'1';el.style.transform=intro||finish?'scale(.97)':'scale(1)'});
+ const ol=document.getElementById('offlabel');ol.hidden=intro||finish;
+ if(intro||finish){people.forEach((p,i)=>setPosition(p.el,intro?'intro':'finish',i,people.length));document.getElementById('detailsBody').innerHTML=intro?'<div><strong>Astronautak</strong><p>5 antolatzaile eta 15 parte-hartzaile. Esperientzia honekin hasiko da azoka.</p></div><div><strong>Ondoren</strong><p>00:55–01:05 · Hiru guneen prestaketa.</p></div>':'<div><strong>Ebaluazioa</strong><p>20 minutu taldeen arteko ondorioak eta iruzkinak partekatzeko.</p></div>';return}
+ const positions=slide.positions;
+ for(const site of ['T','N','A']){
+  const occupants=people.filter(p=>positions[p.id]===site);
+  occupants.sort((a,b)=>{let ah=(a.team===site),bh=(b.team===site);return Number(bh)-Number(ah)||a.id.localeCompare(b.id)});
+  const visitors=occupants.length-hostsPerStation;
+  const roles=site==='T'?`${hostsPerStation} antzezle finko · ${visitors} bisitari`:`${hostsPerStation} arduradun · ${visitors} jokalari`;
+  stage.querySelector(`[data-station="${site}"] .sub`).textContent=roles;
+  occupants.forEach((p,i)=>setPosition(p.el,site,i,occupants.length));
+ }
+ const off=people.filter(p=>positions[p.id]==='O');
+ off.forEach((p,i)=>setPosition(p.el,'O',i,off.length));
+ const offNames=off.map(p=>prefixes[p.team]+p.num).join(', ');
+ document.getElementById('offname').textContent=offNames;
+ document.getElementById('detailsBody').innerHTML=['T','N','A'].map(site=>{const group=people.filter(p=>positions[p.id]===site);const hosts=group.filter(p=>p.team===site),visitors=group.filter(p=>p.team!==site);return `<div><strong>${names[site]}</strong><p>Arduradunak: <code>${hosts.map(p=>prefixes[p.team]+p.num).join(', ')}</code></p><p>Bisitariak: <code>${visitors.map(p=>prefixes[p.team]+p.num).join(', ')}</code></p></div>`}).join('')+`<div><strong>Laguntza / atsedenaldia</strong><p><code>${offNames}</code></p></div>`;
+}
+function go(delta){const target=Math.max(0,Math.min(slides.length-1,current+delta));if(target!==current){current=target;render();if(mobileLayout.matches)window.scrollTo({top:0,behavior:'instant'})}}
+document.getElementById('prev').onclick=()=>go(-1);document.getElementById('next').onclick=()=>go(1);
+const fullscreenButton=document.getElementById('fullscreen');
+fullscreenButton.hidden=!document.fullscreenEnabled;
+fullscreenButton.onclick=async()=>{
+ try{
+  if(document.fullscreenElement)await document.exitFullscreen();
+  else await document.documentElement.requestFullscreen();
+ }catch{fullscreenButton.hidden=true}
+};
+document.addEventListener('keydown',e=>{
+ if(e.defaultPrevented||e.altKey||e.ctrlKey||e.metaKey||e.target.closest('input, textarea, select, [contenteditable]'))return;
+ if(e.key===' '&&e.target.closest('button, summary, a'))return;
+ if(['ArrowRight',' ','PageDown'].includes(e.key)){e.preventDefault();go(1)}
+ else if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();go(-1)}
+});
+window.addEventListener('resize',()=>render());render();
+</script>
+</body></html>
