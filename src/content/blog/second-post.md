@@ -1,338 +1,238 @@
 ---
 title: 'Mi configuración de macOS'
-description: 'Un entorno de trabajo sencillo con Homebrew, zsh, Ghostty, Neovim y AeroSpace.'
+description: 'Mis dotfiles actuales: Homebrew, siete espacios con AeroSpace, Rex, Ghostty y Neovim con LazyVim y Mist.'
 pubDate: 'Jul 15 2022'
+updatedDate: '2026-11-10'
 articleType: 'guides'
 heroImage: '../../assets/blog-placeholder-4.jpg'
 ---
 
-Mi ordenador ideal no llama la atención. No quiero un escritorio espectacular, ni una automatización barroca, ni cincuenta aplicaciones abiertas "por si acaso". Quiero un sistema que desaparezca. Que responda rápido, que sea predecible y que me deje pensar en lo que estoy haciendo: editar, escribir, programar, buscar algo o escuchar música.
+Mi ordenador ideal no llama la atención. Quiero que responda rápido, que sea predecible y que me deje pensar en lo que estoy haciendo: editar, escribir, programar, buscar algo o escuchar música.
 
-Uso macOS como sistema principal. No porque sea perfecto, sino porque en Apple Silicon me da una mezcla muy difícil de igualar: silencio, batería, rendimiento sostenido y un ecosistema de aplicaciones creativas que todavía me compensa. Linux sigue estando muy presente en mi servidor y en mi manera de pensar la informática, pero en el portátil quiero una máquina que no dé guerra.
+Uso macOS como sistema principal. En Apple Silicon encuentro una combinación de silencio, batería, rendimiento sostenido y aplicaciones creativas que me resulta cómoda para trabajar. Linux sigue estando presente en mi servidor y en mi manera de pensar la informática.
 
 Mi forma de usar el ordenador se apoya en cuatro ideas:
 
-1. **Instalar poco y saber exactamente qué hay instalado**.
-2. **Tener contextos de trabajo fijos**.
-3. **Moverme por teclado antes que por interfaz**.
-4. **Usar herramientas sencillas y transparentes**.
+1. **Saber qué tengo instalado y por qué**.
+2. **Dar un lugar predecible a cada aplicación**.
+3. **Moverme por teclado**.
+4. **Mantener la configuración comprensible**.
 
-Esta guía no es teoría. Está basada en mi configuración real de `brew`, `zsh`, `Ghostty`, `Neovim`, `AeroSpace` y `skhd`.
+Esta guía recoge el estado de mis dotfiles en noviembre de 2026. El sistema ha cambiado: ahora tengo siete espacios en AeroSpace, Rex aparece en mi distribución de aplicaciones y Neovim se apoya en LazyVim, con ajustes propios para navegar, compilar y trabajar con notas.
 
-## El sistema: pocas piezas y control explícito
+## Los dotfiles: configuración que puedo revisar
 
-Intento evitar el clásico caos de macOS: aplicaciones instaladas a mano, restos de configuraciones antiguas, `dmg` olvidados y herramientas que ya ni recuerdo para qué servían. Mi solución no es una configuración totalmente declarativa como NixOS, pero sí una versión intermedia bastante práctica.
+Guardo la configuración en `~/.dotfiles` y uso Stow para enlazarla con las ubicaciones donde la esperan las aplicaciones. Mantengo ahí la shell, Git, Ghostty, AeroSpace y Neovim, además del Brewfile y algunos scripts.
 
-Mantengo buena parte de mi sistema en un `brewfile` dentro de mis dotfiles. Ahí tengo tanto herramientas de terminal como aplicaciones gráficas:
+Me interesa poder abrir un archivo, entender qué hace y revisar cómo ha cambiado con el tiempo. El repositorio también me permite distinguir entre una decisión que sigo usando y una prueba que ya he retirado.
 
-```bash
+## Homebrew: un inventario más pequeño
+
+Mi `brewfile` actual contiene estas herramientas y aplicaciones:
+
+```ruby
 # CLI tools
 brew "neovim"
-brew "git"
-brew "curl"
 brew "stow"
 brew "fzf"
 brew "zig"
 brew "go"
 brew "node"
-brew "switchaudio-osx"
-brew "zsh-syntax-highlighting"
-brew "zsh-autosuggestions"
-tap "asmvik/formulae"
-brew "asmvik/formulae/skhd"
-brew "lazygit"
-brew "mole"
+brew "php"
+brew "composer"
 
 # GUI Applications
 cask "zen"
+cask "helium-browser"
 cask "qobuz"
 cask "ghostty"
 cask "obsidian"
 cask "iina"
 cask "obs"
-cask "qbittorrent"
-cask "ente-auth"
-cask "tailscale-app"
 cask "affinity"
-cask "imageoptim"
 cask "blender"
-cask "discord"
 cask "nikitabobko/tap/aerospace"
 ```
 
-No está todo, pero sí casi todo lo importante. El objetivo no es convertir Homebrew en una religión, sino en un inventario fiable.
+Respecto a la configuración anterior, aparecen PHP y Composer entre las herramientas de desarrollo, y Helium entre los navegadores. Otras entradas han salido del archivo. Este inventario recoge lo que gestiono desde el Brewfile; Rex, por ejemplo, tiene una regla en AeroSpace y no figura en esta lista.
 
 ### Brewsync
 
-Para mantener esa lista viva uso una función propia en `.zshrc` llamada `brewsync`. La idea es muy simple: abro el `brewfile` en Neovim, y al cerrar compruebo si ha cambiado. Si ha cambiado, sincronizo. Si no, actualizo igualmente paquetes y limpio.
+Sigo manteniendo una función `brewsync` en `.zshrc`. Abre `~/.dotfiles/brewfile` en Neovim y compara su hash antes y después de editarlo.
 
-```bash
-function brewsync() {
-    local BREWFILE="$HOME/.dotfiles/brewfile"
-    [[ ! -f "$BREWFILE" ]] && echo "$fg[red] Error: Brewfile no encontrado" && return 1
+Si detecta cambios, entra en el directorio de los dotfiles y ejecuta `brew bundle --quiet` y `brew bundle cleanup --force --quiet`. Después actualiza Homebrew, actualiza los paquetes y limpia la caché con `brew cleanup --prune=all`. Si el archivo no cambia, ejecuta esa última parte de actualización y limpieza.
 
-    local OLD_HASH=$(shasum -a 256 "$BREWFILE")
-    nvim "$BREWFILE"
-    local NEW_HASH=$(shasum -a 256 "$BREWFILE")
+Hay un detalle práctico: la limpieza de Bundle elimina las instalaciones gestionadas por Homebrew que no estén declaradas en el Brewfile. Mantener la lista al día forma parte del uso de esta función.
 
-    if [[ "$OLD_HASH" != "$NEW_HASH" ]]; then
-        echo "$fg[cyan]Cambios detectados. Sincronizando Brewfile..."
-        cd "$(dirname "$BREWFILE")" || return
-        brew bundle --quiet
-        brew bundle cleanup --force --quiet
-        brew update
-        brew upgrade
-        brew cleanup --prune=all
-        cd - > /dev/null
-        echo "$fg[green] Sincronización completada."
-    else
-        echo "No hubo cambios en el archivo. Actualizando."
-        brew update
-        brew upgrade
-        brew cleanup --prune=all
-    fi
-}
-```
+## AeroSpace: siete espacios con aplicaciones asignadas
 
-Esto me gusta por dos motivos. Primero, porque reduce el número de decisiones pequeñas. Segundo, porque me obliga a pensar qué entra en el sistema y qué no.
+Antes organizaba el escritorio en tres grandes contextos. Ahora la distribución es más concreta: tengo accesos directos a **siete espacios**, y varias aplicaciones tienen un destino asignado cuando AeroSpace detecta sus ventanas.
 
-## El escritorio: tres contextos, no veinte escritorios
+| Espacio | Aplicación asignada |
+| --- | --- |
+| 1 | Rex |
+| 2 | Zen |
+| 3 | Calendario |
+| 4 | Notas de Apple |
+| 5 | Qobuz |
+| 6 | Safari |
+| 7 | Logic Pro |
 
-Antes usaba un enfoque más directo con ventanas maximizadas y atajos para lanzar aplicaciones. Ahora sigo buscando esa misma rapidez, pero con una capa más: **contexto por workspace**.
-
-Uso [AeroSpace](https://nikitabobko.github.io/AeroSpace/) como gestor de ventanas. Mi configuración es muy pequeña:
+Las reglas mueven las ventanas al espacio correspondiente. Por ejemplo, la de Rex es así:
 
 ```toml
-start-at-login = true
-accordion-padding = 0
+[[on-window-detected]]
+if.app-id = 'com.superlogical.rex'
+run = ['move-node-to-workspace 1']
+```
 
+La regla actúa cuando aparece una ventana, y yo cambio de espacio con `Ctrl` y su número. Para enviar la ventana actual a otro espacio, añado `Shift`:
+
+```toml
 [mode.main.binding]
 ctrl-1 = "workspace 1"
 ctrl-2 = "workspace 2"
 ctrl-3 = "workspace 3"
+ctrl-4 = "workspace 4"
+ctrl-5 = "workspace 5"
+ctrl-6 = "workspace 6"
+ctrl-7 = "workspace 7"
 
 ctrl-shift-1 = "move-node-to-workspace 1"
 ctrl-shift-2 = "move-node-to-workspace 2"
 ctrl-shift-3 = "move-node-to-workspace 3"
-
-alt-shift-h = "focus left"
-alt-shift-l = "focus right"
-alt-shift-k = "focus up"
-alt-shift-j = "focus down"
-
-alt-shift-left  = "move left"
-alt-shift-right = "move right"
-alt-shift-up    = "move up"
-alt-shift-down  = "move down"
-
-ctrl-o = "layout tiles"
-ctrl-p = "layout accordion"
+ctrl-shift-4 = "move-node-to-workspace 4"
+ctrl-shift-5 = "move-node-to-workspace 5"
+ctrl-shift-6 = "move-node-to-workspace 6"
+ctrl-shift-7 = "move-node-to-workspace 7"
 ```
 
-No necesito más. Tengo solo **tres espacios** y cada uno tiene un papel bastante claro:
+AeroSpace arranca al iniciar sesión y mantiene `accordion-padding = 0`. Los atajos de foco y distribución también han cambiado:
 
-- **Workspace 1**: código y desarrollo.
-- **Workspace 2**: organización personal, navegador y notas.
-- **Workspace 3**: trabajo audiovisual y herramientas creativas.
+| Atajo | Acción |
+| --- | --- |
+| `Ctrl + J` | Foco a la izquierda |
+| `Ctrl + K` | Foco a la derecha |
+| `Ctrl + Q` | Distribución en mosaico |
+| `Ctrl + W` | Distribución en acordeón |
 
-Eso es importante: no uso workspaces como cajones caóticos, sino como contextos funcionales.
+FaceTime tiene una excepción: sus ventanas se configuran como flotantes.
 
-## SKHD: el teclado cambia según el contexto
+La antigua cuadrícula de lanzadores contextuales con `skhd` ya no está en el repositorio. Los atajos que describo aquí están definidos directamente en AeroSpace.
 
-La pieza más interesante del sistema no es AeroSpace, sino `skhd`. Ahí es donde el ordenador empieza a sentirse realmente personal.
+## Audio y red desde el teclado
 
-Mi `skhdrc` no se limita a abrir una app concreta. Lo que hace es reinterpretar la misma tecla según el workspace donde estoy. Por ejemplo:
+El cambio de salida de audio y el acceso a Tailscale también viven ahora en la configuración de AeroSpace:
 
-```bash
-# ALT + Q
-alt - q : \
-  case "$(aerospace list-workspaces --focused)" in \
-    1) open -a "Codex" ;; \
-    2) open -a "Things3" ;; \
-    3) open -a "DaVinci Resolve" ;; \
-  esac
-
-# ALT + W
-alt - w : \
-  case "$(aerospace list-workspaces --focused)" in \
-    1) open -a "Antigravity" ;; \
-    2) open -a "Zen" ;; \
-    3) open -a "Logic Pro" ;; \
-  esac
-
-# ALT + E
-alt - e : \
-  case "$(aerospace list-workspaces --focused)" in \
-    1) open -a "Ghostty" ;; \
-    2) open -a "Obsidian" ;; \
-    3) open -a "Soundly" ;; \
-  esac
+```toml
+ctrl-e = 'exec-and-forget SwitchAudioSource -s "iFi (by AMR) HD USB Audio Output"'
+ctrl-r = 'exec-and-forget SwitchAudioSource -s "Altavoces del MacBook Pro"'
+ctrl-t = 'exec-and-forget ~/.dotfiles/scripts/toggle-tailscale.sh'
 ```
 
-Esto me encanta porque reduce muchísimo la fricción. No tengo que memorizar veinte combinaciones. Memorizo una pequeña cuadrícula mental:
+La segunda salida ya es la de los altavoces del MacBook Pro. El script de Tailscale consulta el estado de la conexión y ejecuta `tailscale up` o `tailscale down` según el resultado.
 
-- `ALT + Q`
-- `ALT + W`
-- `ALT + E`
-- `ALT + R`
-- `ALT + A`
+Estos accesos usan `SwitchAudioSource` y el comando `tailscale`, que deben estar disponibles aunque no figuren en el Brewfile actual.
 
-Y luego cada tecla adquiere significado según el espacio en el que estoy.
+## Rex y Ghostty
 
-### Mi mapa mental de trabajo
-
-En la práctica, esa cuadrícula queda así:
-
-**Workspace 1: código**
-- `ALT + Q` → Codex
-- `ALT + W` → Antigravity
-- `ALT + E` → Ghostty
-- `ALT + R` → Xcode
-- `ALT + A` → Finder en `~/Development`
-
-**Workspace 2: organización**
-- `ALT + Q` → Things3
-- `ALT + W` → Zen
-- `ALT + E` → Obsidian
-- `ALT + R` → aquí todavía tengo pendiente rematar el caso de Calendar
-- `ALT + A` → Finder en `~`
-
-**Workspace 3: audiovisual**
-- `ALT + Q` → DaVinci Resolve
-- `ALT + W` → Logic Pro
-- `ALT + E` → Soundly
-- `ALT + R` → Affinity
-- `ALT + A` → Finder en `/Volumes/CZM2/`
-
-Ese último detalle es especialmente bueno: el Finder no abre "una carpeta cualquiera", sino **la carpeta correcta según el contexto de trabajo**. En desarrollo entro a proyectos. En organización entro a mi home. En audiovisual entro al volumen donde está el material.
-
-## Audio y utilidades rápidas
-
-También uso `skhd` para tareas pequeñas pero repetitivas. Por ejemplo, cambiar la salida de audio sin tocar menús:
-
-```bash
-ctrl - e : SwitchAudioSource -s "iFi (by AMR) HD USB Audio Output"
-ctrl - r : SwitchAudioSource -s "BenQ EX2780Q"
-ctrl - t : ~/.dotfiles/scripts/toggle-tailscale.sh
-```
-
-Son atajos poco glamourosos, pero precisamente por eso merecen ser teclas. Si algo hago constantemente, no debería vivir enterrado en un icono de la barra de menú.
-
-## La terminal: Ghostty grande, limpia y cómoda
-
-Uso [Ghostty](https://ghostty.org/) como terminal. Mi configuración es muy simple y va completamente en la dirección de la legibilidad:
+Rex tiene asignado el primer espacio, y mi configuración de Neovim detecta cuándo se está ejecutando dentro de él para adaptar los colores. Sigo manteniendo también una configuración de Ghostty:
 
 ```ini
-font-family = "JetBrains Mono"
-font-size = 23
-theme = Dark+
+font-family = "SF Mono"
 macos-titlebar-style = tabs
 mouse-hide-while-typing = true
 shell-integration-features = ssh-env,ssh-terminfo
 bell-features = border
+font-size = 23
+theme = Dark+
 adjust-cell-height = 10%
 window-save-state = always
-window-padding-y = 4
+window-padding-y = 8
 ```
 
-Hay dos cosas que destacan aquí:
+Los cambios más visibles respecto a la versión anterior son la fuente **SF Mono** y el padding vertical de **8**. Mantengo el tamaño de letra en 23, la altura de celda aumentada un 10 %, las pestañas en la barra de título y la conservación del estado de las ventanas.
 
-1. **Tipografía muy grande**. No quiero una terminal diminuta con veinte paneles. Quiero leer sin esfuerzo.
-2. **Interfaz casi invisible**. Tabs de macOS, poco padding, campana visual en vez de sonido y estado de ventana persistente.
+La legibilidad sigue teniendo mucho peso en estas decisiones. Quiero leer la terminal con comodidad durante sesiones largas.
 
-Mi terminal no intenta ser un dashboard. Es una superficie de trabajo.
+## Zsh: un prompt propio y acceso directo a los proyectos
 
-## La shell: Zsh con prompt propio
+La shell sigue siendo Zsh con Oh My Zsh y los plugins `zsh-syntax-highlighting` y `zsh-autosuggestions`.
 
-La shell sigue siendo `zsh`, pero no uso un tema complejo. Tengo un prompt hecho a mano que enseña exactamente lo que necesito:
+El prompt muestra la ruta en una línea y el símbolo `❯` en la siguiente. En los repositorios añade la rama de Git: gris cuando el árbol de trabajo está limpio y roja cuando hay cambios. La información de la rama se obtiene con `vcs_info`, y la comprobación del estado se realiza en `precmd`, antes de dibujar el prompt.
 
-- ruta actual,
-- rama git,
-- y estado del repositorio.
+La función `ff` también ha cambiado. Ahora busca proyectos en `~/Dev`, usa la presentación mínima de `fzf` y abre el directorio seleccionado en Neovim:
 
-Además cargo `zsh-syntax-highlighting` y `zsh-autosuggestions`, que para mí son dos mejoras básicas de calidad de vida.
-
-También tengo una función pequeña llamada `ff` para saltar rápidamente entre proyectos dentro de `~/Development` usando `fzf`:
-
-```bash
+```zsh
 ff() {
   local dir
-  dir=$(find $HOME/Development -type d -maxdepth 1 ! -name '.*' | fzf)
+  dir=$(find $HOME/Dev -type d -maxdepth 1 ! -name '.*' | fzf --style minimal)
   if [ -n "$dir" ]; then
     cd "$dir" || return
+    nvim . || return
     clear
   fi
 }
 bindkey -s '^F' 'ff\n'
 ```
 
-Este tipo de cosas me interesan mucho más que una shell "impresionante". No busco demostrar nada. Busco ir más rápido.
+Con `Ctrl + F` elijo el proyecto, cambio a su carpeta y entro en el editor. Al salir de Neovim, la terminal sigue situada en ese proyecto.
 
-## El editor: Neovim, pero sin convertirlo en un avión
+## Neovim: LazyVim con una interfaz más contenida
 
-Neovim es mi editor principal. Mi configuración también es relativamente contenida:
+La base actual es **LazyVim**, cargada mediante `lazy.nvim`. Sobre ella mantengo ajustes propios de interfaz, navegación y compilación. La antigua lista de plugins con Rose Pine, Telescope y Neo-tree ya no describe esta configuración.
 
-- `lazy.nvim` como gestor de plugins,
-- `rose-pine` como tema,
-- `Treesitter`,
-- `Mason`,
-- `indent-blankline`,
-- `blink.cmp`,
-- `Telescope`,
-- `lualine`,
-- `Neo-tree`.
-
-Y algunas decisiones de base muy importantes:
+Fuera de Rex uso **Evergarden**, con la variante `fall`, acento verde y fondo transparente. Dentro de Rex uso el esquema integrado `default` y desactivo los colores RGB para que Neovim siga la paleta de la terminal:
 
 ```lua
-vim.g.mapleader = " "
-vim.opt.number = true
-vim.opt.relativenumber = true
-vim.opt.termguicolors = true
-vim.opt.laststatus = 3
-vim.opt.tabstop = 4
-vim.opt.shiftwidth = 2
-vim.opt.expandtab = true
-vim.opt.fillchars = { eob = " " }
-vim.opt.clipboard = "unnamedplus"
+vim.g.rex_terminal = (vim.env.REX_BLOCK or "") ~= "" or vim.env.TERM == "xterm-rex"
+if vim.g.rex_terminal then
+  vim.opt.termguicolors = false
+end
 ```
 
-Lo que más me gusta de esta configuración es que se nota que está pensada para trabajar, no para presumir:
+Lualine usa en ese caso un tema de 16 colores, con el área del nombre del archivo heredando el primer plano y el fondo de Rex. Así, cambiar el tema de Rex actualiza también los colores del editor abierto. Evergarden se carga cuando es el tema seleccionado.
 
-- números relativos,
-- portapapeles del sistema,
-- transparencia forzada,
-- Telescope para encontrar archivos,
-- Neo-tree para abrir estructura cuando hace falta,
-- y una barra de estado global.
+He desactivado Bufferline, Oil, el explorador de Snacks y su desplazamiento animado. Mantengo la línea de comandos abajo, sin el formato de paleta flotante, y la barra de estado muestra el modo y la ruta del archivo sin separadores.
 
-No intento meter todas las ideas del ecosistema de Neovim. Solo las que de verdad mejoran mi uso diario.
+### Archivos y compilación
 
-## Filosofía general
+Para explorar directorios uso **netrw**. Snacks sigue disponible para los selectores de archivos, proyectos y buffers, con paneles en la parte inferior. El selector de archivos oculta la vista previa y excluye los archivos ocultos y `node_modules`.
 
-Si tuviera que resumir todo esto en una sola idea, sería esta:
+Estos son algunos de mis atajos propios; `<leader>` representa la tecla prefijo de los atajos de Neovim:
 
-**Quiero que cada tecla tenga contexto y cada herramienta tenga una razón para existir.**
+| Atajo | Acción |
+| --- | --- |
+| `<leader>e` | Abrir `:Explore` |
+| `<leader>E` | Abrir el directorio de trabajo en netrw |
+| `<leader>fe` | Preparar `:edit` con la ruta del directorio actual |
+| `<leader>fd` | Preparar `:Explore` con esa ruta |
+| `<leader>cc` | Ejecutar `:Compile` |
+| `<leader>cg` | Repetir con `:Recompile` |
 
-No me interesa optimizar por optimizar. Me interesa reducir ruido. Tener un sistema que:
+En la edición de rutas, Retroceso elimina un componente completo del camino. Es un ajuste pequeño que facilita subir de directorio sin borrar letra a letra.
 
-- instala poco,
-- se entiende fácil,
-- responde rápido,
-- y me permite entrar en modo trabajo sin pelearme con él.
+La compilación sigue una idea familiar de Emacs: introducir un comando, recoger su salida en un buffer `*compilation*` y poder repetirlo. El comando inicial es `zig build`, pero puedo sustituirlo desde `:Compile`.
 
-Por eso solo tengo tres workspaces. Por eso mis atajos son contextuales. Por eso mi terminal es enorme. Por eso mantengo un `brewfile`. Por eso prefiero herramientas discretas como Ghostty, `fzf`, `skhd` o AeroSpace.
+## Mist: notas y tareas en Markdown
 
-No necesito un ordenador futurista. Necesito uno que no estorbe.
+Otra incorporación es **Mist**, un conjunto de módulos propios dentro de la configuración de Neovim. Trabaja sobre `~/notes`, con una bandeja de entrada en `inbox.md` y notas diarias en `daily/`.
 
-## Resumen rápido
+| Comando | Uso |
+| --- | --- |
+| `:MistCapture` | Capturar una tarea |
+| `:MistAgenda` | Consultar la agenda |
+| `:MistOutline` | Navegar por los encabezados de una nota |
+| `:MistFiles` | Explorar los archivos de notas |
+| `:MistInbox` | Abrir la bandeja de entrada |
+| `:MistToday` | Abrir o crear la nota del día |
 
-- **Sistema**: Homebrew + `brewfile` + `brewsync`.
-- **Ventanas**: AeroSpace con 3 workspaces.
-- **Atajos**: `skhd` contextual según el workspace.
-- **Terminal**: Ghostty, grande, limpia y sin ruido.
-- **Shell**: Zsh con prompt propio, `fzf`, autocompletado y resaltado.
-- **Editor**: Neovim práctico, transparente y orientado a búsqueda rápida.
-- **Audio**: cambio directo entre auriculares y altavoces por tecla.
+Dentro de las notas Markdown de ese directorio tengo además atajos como `,cc` para capturar, `,aa` para la agenda y `,gt` para la nota de hoy. Espacio marca o desmarca una tarea.
 
-Es probablemente la manera más cercana que he encontrado de hacer que el ordenador se comporte como una herramienta y no como un entretenimiento.
+Una de las últimas mejoras ha sido posponer la construcción del índice hasta que se consulta o se guarda una nota. Abrir un archivo de código o un directorio ya no provoca un recorrido inicial por todas las notas. Los resaltados de Mist también siguen la paleta de la terminal.
+
+## Lo que mantengo como criterio
+
+La configuración ha crecido en unas partes y se ha reducido en otras. Tengo más espacios, pero las aplicaciones principales tienen destinos concretos. Neovim parte de LazyVim, y mis ajustes se concentran en la navegación, la lectura y las tareas que repito.
+
+Sigo buscando lo mismo: que abrir un proyecto, encontrar una nota, mover una ventana o cambiar la salida de audio requiera pocas decisiones. Los dotfiles me permiten revisar si cada cambio acerca el ordenador a esa forma de trabajar.
