@@ -1,6 +1,6 @@
 ---
 title: 'Mi configuración de macOS'
-description: 'Mis dotfiles actuales: Homebrew, siete espacios con AeroSpace, Rex, Ghostty y Neovim con LazyVim y Mist.'
+description: 'Mi entorno de trabajo en macOS: Homebrew, AeroSpace, Rex, Neovim y un flujo de desarrollo con agentes.'
 pubDate: 'Jul 15 2022'
 updatedDate: '2026-11-10'
 articleType: 'guides'
@@ -18,7 +18,7 @@ Mi forma de usar el ordenador se apoya en cuatro ideas:
 3. **Moverme por teclado**.
 4. **Mantener la configuración comprensible**.
 
-Esta guía recoge el estado de mis dotfiles en noviembre de 2026. El sistema ha cambiado: ahora tengo siete espacios en AeroSpace, Rex aparece en mi distribución de aplicaciones y Neovim se apoya en LazyVim, con ajustes propios para navegar, compilar y trabajar con notas.
+Esta guía recoge el estado de mi entorno de trabajo en noviembre de 2026. Ahora tengo siete espacios en AeroSpace, uso Rex como terminal en lugar de Ghostty y Neovim se apoya en LazyVim, con ajustes propios para navegar, compilar y trabajar con notas. Los agentes también forman parte de mi manera de desarrollar.
 
 ## Los dotfiles: configuración que puedo revisar
 
@@ -54,7 +54,7 @@ cask "blender"
 cask "nikitabobko/tap/aerospace"
 ```
 
-Respecto a la configuración anterior, aparecen PHP y Composer entre las herramientas de desarrollo, y Helium entre los navegadores. Otras entradas han salido del archivo. Este inventario recoge lo que gestiono desde el Brewfile; Rex, por ejemplo, tiene una regla en AeroSpace y no figura en esta lista.
+Respecto a la configuración anterior, aparecen PHP y Composer entre las herramientas de desarrollo, y Helium entre los navegadores. Otras entradas han salido del archivo. El Brewfile todavía incluye Ghostty, aunque mi terminal actual es Rex, que tiene una regla en AeroSpace y no figura en esta lista.
 
 ### Brewsync
 
@@ -134,26 +134,31 @@ La segunda salida ya es la de los altavoces del MacBook Pro. El script de Tailsc
 
 Estos accesos usan `SwitchAudioSource` y el comando `tailscale`, que deben estar disponibles aunque no figuren en el Brewfile actual.
 
-## Rex y Ghostty
+## Rex: mi terminal actual
 
-Rex tiene asignado el primer espacio, y mi configuración de Neovim detecta cuándo se está ejecutando dentro de él para adaptar los colores. Sigo manteniendo también una configuración de Ghostty:
+He sustituido Ghostty por **Rex** para el trabajo diario. Tiene asignado el primer espacio de AeroSpace, y mi configuración de Neovim detecta cuándo se está ejecutando dentro de él para adaptar los colores.
 
-```ini
-font-family = "SF Mono"
-macos-titlebar-style = tabs
-mouse-hide-while-typing = true
-shell-integration-features = ssh-env,ssh-terminfo
-bell-features = border
-font-size = 23
-theme = Dark+
-adjust-cell-height = 10%
-window-save-state = always
-window-padding-y = 8
-```
+La configuración de Ghostty sigue guardada en los dotfiles como referencia de mi entorno anterior. Sus ajustes de fuente, padding y apariencia corresponden a Ghostty; la integración de Neovim con Rex se configura por separado.
 
-Los cambios más visibles respecto a la versión anterior son la fuente **SF Mono** y el padding vertical de **8**. Mantengo el tamaño de letra en 23, la altura de celda aumentada un 10 %, las pestañas en la barra de título y la conservación del estado de las ventanas.
+La legibilidad sigue teniendo mucho peso en estas decisiones. Quiero leer la terminal con comodidad durante sesiones largas y mantener una apariencia coherente entre ella y el editor.
 
-La legibilidad sigue teniendo mucho peso en estas decisiones. Quiero leer la terminal con comodidad durante sesiones largas.
+## Desarrollo con agentes
+
+Los agentes de programación forman parte de mi flujo de trabajo. Les encargo tareas concretas sobre un repositorio: investigar un problema, implementar un cambio o actualizar la documentación a partir del código. La conversación sirve para definir el resultado y corregir el rumbo mientras avanzan.
+
+Mantengo mis preferencias en archivos `AGENTS.md`: soluciones sencillas, aprovechar el sistema de tipos, comentarios al día y pruebas centradas en el comportamiento que importa. También distingo entre pedir una explicación y encargar una modificación: una pregunta sobre el código debe poder quedarse en una respuesta, sin provocar cambios en los archivos.
+
+El recorrido habitual de una tarea es este:
+
+1. **Definir el resultado.** Explico qué quiero conseguir y las restricciones que debe respetar el cambio.
+2. **Consultar el contexto.** El agente revisa el repositorio, sus instrucciones y los archivos relacionados antes de proponer o implementar una solución.
+3. **Trabajar y comprobar.** Hace los cambios y ejecuta las comprobaciones pertinentes: compilar, probar el comportamiento afectado o revisar el resultado generado, según la tarea.
+4. **Revisar la entrega.** Deja un resumen de lo que ha cambiado, cómo lo ha comprobado y cualquier limitación pendiente.
+5. **Guardar y publicar.** El agente crea el commit; yo reviso el resultado y hago el push.
+
+Ese último reparto es una preferencia explícita de mi configuración. Me permite delegar el trabajo sobre los archivos y conservar un punto de revisión antes de enviar los cambios al repositorio remoto.
+
+También me interesa que el contexto sea verificable. Al encargar la documentación de una configuración, el punto de partida son sus archivos actuales. Las preguntas sirven para completar lo que el repositorio no explica.
 
 ## Zsh: un prompt propio y acceso directo a los proyectos
 
@@ -235,4 +240,4 @@ Una de las últimas mejoras ha sido posponer la construcción del índice hasta 
 
 La configuración ha crecido en unas partes y se ha reducido en otras. Tengo más espacios, pero las aplicaciones principales tienen destinos concretos. Neovim parte de LazyVim, y mis ajustes se concentran en la navegación, la lectura y las tareas que repito.
 
-Sigo buscando lo mismo: que abrir un proyecto, encontrar una nota, mover una ventana o cambiar la salida de audio requiera pocas decisiones. Los dotfiles me permiten revisar si cada cambio acerca el ordenador a esa forma de trabajar.
+Sigo buscando lo mismo: que abrir un proyecto, encontrar una nota, mover una ventana o cambiar la salida de audio requiera pocas decisiones. Rex, Neovim y el trabajo con agentes forman parte de ese entorno. Los dotfiles me permiten revisar si cada cambio acerca el ordenador a esa forma de trabajar.
