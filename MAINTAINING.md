@@ -67,14 +67,6 @@ For a two-state line chart, assign each series `state: 0` or `state: 1` and add:
 toggle={{ labels: ['Estado A', 'Estado B'] }}
 ```
 
-## Class groups
-
-The standalone Basque class page lives in `src/pages/taldeak/index.html` and is published at `https://castro.eus/taldeak`. Keep its own styles and scripts together to preserve the presentation layout.
-
-After editing the rotation assignments, run `npm test` to check station capacity, hosts, and participant visits. The tests live in `tests/`, outside Astro's page routes.
-
-Check all seven steps on a narrow phone screen as well as desktop. Mobile uses stacked stations and fixed navigation at the bottom.
-
 ## Before publishing
 
 ```sh
