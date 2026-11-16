@@ -1,5 +1,8 @@
 ---
-const projects = ['WaveSearch', 'Web de vídeo', 'Web del curso', 'Workflows', 'Blog'];
+const projects = [
+	'WaveSearch', 'Web de vídeo', 'Web del curso', 'Workflows', 'Web personal',
+	'TaldeBOT', 'Iko-Connect', 'tresna', 'Blog', 'Dotfiles', 'Recursos', 'Audio',
+];
 ---
 
 <figure class="fuzzy-demo" data-fuzzy-finding data-opened="false">
@@ -8,10 +11,9 @@ const projects = ['WaveSearch', 'Web de vídeo', 'Web del curso', 'Workflows', '
 			<span class="half-label">Búsqueda</span>
 			<div class="search-controls">
 				<div class="query-line">
-					<span class="query-prompt">❯</span>
+					<span class="query-prompt">&gt;</span>
 					<span data-query></span><span class="query-cursor"></span>
 				</div>
-				<kbd class="keycap" data-keycap>w</kbd>
 			</div>
 		</div>
 		<span class="demo-arrow">→</span>
@@ -24,39 +26,31 @@ const projects = ['WaveSearch', 'Web de vídeo', 'Web del curso', 'Workflows', '
 							{Array.from(name).map((letter) => <span data-letter>{letter}</span>)}
 						</div>
 					))}
-					<span class="result-count" data-result-count>5 proyectos</span>
+					<span class="result-count" data-result-count>{projects.length} proyectos</span>
 				</div>
 				<div class="opened-result">WaveSearch</div>
 			</div>
 		</div>
 	</div>
-	<figcaption>w → v → s → WaveSearch. Las letras coinciden en orden, aunque estén separadas.</figcaption>
+	<figcaption>wvs → WaveSearch. Las letras coinciden en orden, aunque estén separadas.</figcaption>
 </figure>
 
 <script>
 	interface Frame {
-		key: string;
 		query: string;
 		duration: number;
-		pressed?: boolean;
 		opened?: boolean;
 	}
 
 	const word = 'wvs';
-	// Preview each letter, press it, filter the list, then leave time to read the result.
-	const frames: Frame[] = Array.from(word).flatMap((key, index) => [
-		{ key, query: word.slice(0, index), duration: 500 },
-		{ key, query: word.slice(0, index), pressed: true, duration: 140 },
-		{ key, query: word.slice(0, index + 1), pressed: true, duration: 240 },
-		{ key, query: word.slice(0, index + 1), duration: 850 },
-	]);
-	frames.push(
-		{ key: '↵', query: word, duration: 500 },
-		{ key: '↵', query: word, pressed: true, duration: 220 },
-		{ key: '↵', query: word, pressed: true, opened: true, duration: 260 },
-		{ key: '↵', query: word, opened: true, duration: 1800 },
-		{ key: 'w', query: '', duration: 1000 },
-	);
+	// Type quickly at the prompt, then leave time to read and open the result.
+	const frames: Frame[] = [
+		{ query: '', duration: 600 },
+		{ query: 'w', duration: 180 },
+		{ query: 'wv', duration: 180 },
+		{ query: word, duration: 700 },
+		{ query: word, opened: true, duration: 1100 },
+	];
 
 	// Return the matching character positions, or null when the query is not a subsequence.
 	const matchLetters = (name: string, query: string): number[] | null => {
@@ -73,7 +67,6 @@ const projects = ['WaveSearch', 'Web de vídeo', 'Web del curso', 'Workflows', '
 
 	document.querySelectorAll<HTMLElement>('[data-fuzzy-finding]').forEach((demo) => {
 		const queryText = demo.querySelector<HTMLElement>('[data-query]');
-		const keycap = demo.querySelector<HTMLElement>('[data-keycap]');
 		const resultCount = demo.querySelector<HTMLElement>('[data-result-count]');
 		const rows = Array.from(demo.querySelectorAll<HTMLElement>('[data-result]')).map((row) => ({
 			row,
@@ -88,10 +81,6 @@ const projects = ['WaveSearch', 'Web de vídeo', 'Web del curso', 'Workflows', '
 
 		const render = (frame: Frame) => {
 			if (queryText) queryText.textContent = frame.query;
-			if (keycap) {
-				keycap.textContent = frame.key;
-				keycap.classList.toggle('is-pressed', frame.pressed ?? false);
-			}
 			demo.dataset.opened = String(frame.opened ?? false);
 			let count = 0;
 			rows.forEach(({ row, name, letters }) => {
@@ -115,14 +104,13 @@ const projects = ['WaveSearch', 'Web de vídeo', 'Web del curso', 'Workflows', '
 			if (!inView || document.hidden || motionPreference.matches) {
 				window.clearTimeout(timer);
 				playing = false;
-				keycap?.classList.remove('is-pressed');
 				if (motionPreference.matches) {
-					render({ key: '↵', query: word, duration: 0 });
+					render({ query: word, duration: 0 });
 					frameIndex = 0;
 				}
 			} else if (!playing) {
 				playing = true;
-				timer = window.setTimeout(advance, 700);
+				timer = window.setTimeout(advance, 350);
 			}
 		};
 
@@ -138,58 +126,38 @@ const projects = ['WaveSearch', 'Web de vídeo', 'Web del curso', 'Workflows', '
 
 <style>
 	.fuzzy-demo { margin: 2rem 0; max-width: 48rem; }
-	.demo-stage { position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); min-height: 18rem; }
+	.demo-stage { position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); min-height: 22rem; }
 	.demo-half { display: flex; min-width: 0; flex-direction: column; align-items: center; justify-content: center; gap: 1.5rem; padding: 1.5rem; }
 	.half-label { color: var(--color-muted); font-size: 0.6rem; line-height: 1; letter-spacing: 0.12em; text-transform: uppercase; }
-	.search-controls { display: flex; height: 11rem; flex-direction: column; align-items: center; justify-content: center; gap: 1.5rem; }
+	.search-controls { display: flex; height: 16rem; align-items: center; justify-content: center; }
 	.query-line { display: flex; align-items: center; min-width: 5.5rem; height: 1.5rem; font-family: var(--font-mono); font-size: 1.1rem; }
 	.query-prompt { margin-right: 0.7rem; color: var(--color-focus); }
 	.query-cursor { width: 1px; height: 1.1rem; margin-left: 0.2rem; background: var(--color-focus); }
 
-	.fuzzy-demo .keycap {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		width: 3rem;
-		height: 3rem;
-		padding: 0;
-		border: 1px solid var(--color-line);
-		border-radius: 0.25rem;
-		background: var(--color-paper);
-		box-shadow: 0 4px 0 var(--color-line);
-		color: var(--color-ink);
-		font-family: var(--font-mono);
-		font-size: 1rem;
-		line-height: 1;
-		transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease, color 120ms ease, border-color 120ms ease;
-	}
-
-	.fuzzy-demo .keycap.is-pressed { transform: translateY(4px); border-color: var(--color-focus); background: var(--color-focus); box-shadow: 0 0 0 var(--color-line); color: #fff; }
 	.demo-arrow { position: absolute; top: calc(50% + 1rem); left: 50%; transform: translate(-50%, -50%); padding: 0.2rem; color: var(--color-muted); font-size: 1.2rem; line-height: 1; }
-	.results-stage { position: relative; width: 100%; max-width: 13rem; height: 11rem; }
-	.result-list { transition: opacity 220ms ease; }
-	.result { height: 1.9rem; padding: 0.35rem 0.6rem; overflow: hidden; color: var(--color-muted); font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.2rem; white-space: nowrap; transition: height 260ms ease, padding 260ms ease, opacity 220ms ease, background 220ms ease, color 220ms ease; }
+	.results-stage { position: relative; width: 100%; max-width: 13rem; height: 16rem; }
+	.result-list { position: absolute; top: 50%; width: 100%; transform: translateY(-50%); transition: opacity 160ms ease; }
+	.result { height: 1.2rem; padding: 0.1rem 0.6rem; overflow: hidden; color: var(--color-muted); font-family: var(--font-mono); font-size: 0.8rem; line-height: 1rem; white-space: nowrap; transition: height 160ms ease, padding 160ms ease, opacity 160ms ease, background 160ms ease, color 160ms ease; }
 	.result.is-hidden { height: 0; padding-block: 0; opacity: 0; }
 	.result .is-match { color: var(--color-focus); font-weight: 700; }
 	.result.is-selected { background: var(--color-focus); color: #fff; }
 	.result.is-selected .is-match { color: inherit; text-decoration: underline; text-underline-offset: 0.15em; }
-	.result-count { display: block; margin-top: 0.5rem; padding-left: 0.6rem; color: var(--color-muted); font-size: 0.6rem; }
-	.opened-result { position: absolute; top: 2.5rem; display: flex; width: 100%; height: 6rem; align-items: center; justify-content: center; background: var(--color-focus); color: #fff; font-size: 1rem; font-weight: 500; opacity: 0; transform: translateY(0.4rem); transition: opacity 260ms ease, transform 260ms ease; }
+	.result-count { display: block; margin-top: 0.4rem; padding-left: 0.6rem; color: var(--color-muted); font-size: 0.6rem; line-height: 1rem; }
+	.opened-result { position: absolute; top: 50%; display: flex; width: 100%; height: 6rem; align-items: center; justify-content: center; background: var(--color-focus); color: #fff; font-size: 1rem; font-weight: 500; opacity: 0; transform: translateY(calc(-50% + 0.4rem)); transition: opacity 160ms ease, transform 160ms ease; }
 	.fuzzy-demo[data-opened='true'] .result-list { opacity: 0; }
-	.fuzzy-demo[data-opened='true'] .opened-result { opacity: 1; transform: translateY(0); }
+	.fuzzy-demo[data-opened='true'] .opened-result { opacity: 1; transform: translateY(-50%); }
 	figcaption { margin-top: 0.65rem; color: var(--color-muted); font-size: 0.7rem; line-height: 1.6; }
 
 	@media (max-width: 480px) {
-		.demo-stage { min-height: 17rem; }
+		.demo-stage { min-height: 21rem; }
 		.demo-half { gap: 1.25rem; padding: 1rem; }
 		.query-line { min-width: 4.75rem; font-size: 0.95rem; }
-		.fuzzy-demo .keycap { width: 2.25rem; height: 2.5rem; font-size: 0.9rem; }
 		.result { padding-inline: 0.3rem; font-size: 0.7rem; }
 		.result-count { padding-left: 0.3rem; }
 		.opened-result { font-size: 0.8rem; }
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.fuzzy-demo .keycap, .result, .result-list, .opened-result { transition: none; }
+		.result, .result-list, .opened-result { transition: none; }
 	}
 </style>
