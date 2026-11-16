@@ -1,15 +1,28 @@
 ---
 interface Props {
-	mode: 'workspaces' | 'layouts';
+	mode: 'workspaces' | 'layouts' | 'focus';
 }
 
 const { mode } = Astro.props;
 const isWorkspaces = mode === 'workspaces';
-const shortcuts = isWorkspaces ? ['1', '2', '3'] : ['Q', 'W'];
 const applications = ['Rex', 'Zen', 'Calendario'];
-const description = isWorkspaces
-	? 'Ctrl + 1 → Rex · Ctrl + 2 → Zen · Ctrl + 3 → Calendario.'
-	: 'Ctrl + Q → mosaico · Ctrl + W → acordeón.';
+const { shortcuts, description, label } = {
+	workspaces: {
+		shortcuts: ['1', '2', '3'],
+		description: 'Ctrl + 1 → Rex · Ctrl + 2 → Zen · Ctrl + 3 → Calendario.',
+		label: 'Aplicación',
+	},
+	layouts: {
+		shortcuts: ['Q', 'W'],
+		description: 'Ctrl + Q → mosaico · Ctrl + W → acordeón.',
+		label: 'Distribución',
+	},
+	focus: {
+		shortcuts: ['J', 'K'],
+		description: 'Ctrl + J → foco a la izquierda · Ctrl + K → foco a la derecha.',
+		label: 'Foco',
+	},
+}[mode];
 ---
 
 <figure class="window-demo" data-window-management data-mode={mode} data-layout="tiles" aria-label={description}>
@@ -28,8 +41,8 @@ const description = isWorkspaces
 		</div>
 		<span class="demo-arrow">→</span>
 		<div class="demo-half application-half">
-			<span class="half-label">{isWorkspaces ? 'Aplicación' : 'Distribución'}</span>
-			<div class:list={['application-stage', { 'layout-stage': !isWorkspaces }]}>
+			<span class="half-label">{label}</span>
+			<div class:list={['application-stage', { 'layout-stage': !isWorkspaces, 'focus-stage': mode === 'focus' }]}>
 				{(isWorkspaces ? applications : applications.slice(0, 2)).map((name, index) => (
 					<div class:list={['application-window', { 'is-current': index === 0 }]} data-application>{name}</div>
 				))}
@@ -81,10 +94,10 @@ const description = isWorkspaces
 				window.setTimeout(() => keycap?.classList.add('is-pressed'), previewDelay + 140),
 				window.setTimeout(() => {
 					currentStep = nextStep;
-					if (demo.dataset.mode === 'workspaces') {
-						applications.forEach((app, index) => app.classList.toggle('is-current', index === currentStep));
-					} else {
+					if (demo.dataset.mode === 'layouts') {
 						demo.dataset.layout = currentStep === 0 ? 'tiles' : 'accordion';
+					} else {
+						applications.forEach((app, index) => app.classList.toggle('is-current', index === currentStep));
 					}
 				}, previewDelay + 360),
 				window.setTimeout(releaseKeys, previewDelay + 720),
@@ -265,6 +278,14 @@ const description = isWorkspaces
 		opacity: 0.55;
 	}
 
+	.focus-stage .application-window {
+		opacity: 0.35;
+	}
+
+	.focus-stage .application-window.is-current {
+		opacity: 1;
+	}
+
 	figcaption {
 		margin-top: 0.65rem;
 		color: var(--color-muted);
@@ -283,6 +304,6 @@ const description = isWorkspaces
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.window-demo .keycap, .application-window { transition: none; }
+		.window-demo .keycap, .window-demo .application-window { transition: none; }
 	}
 </style>
