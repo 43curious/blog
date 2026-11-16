@@ -14,7 +14,7 @@ const description = isWorkspaces
 
 <figure class="window-demo" data-window-management data-mode={mode} data-layout="tiles" aria-label={description}>
 	<div class="demo-stage" aria-hidden="true">
-		<div class="demo-half keyboard-half">
+		<div class="demo-half">
 			<span class="half-label">Combinación</span>
 			<div class="key-combo">
 				<kbd class="keycap modifier-key" data-modifier>ctrl</kbd>
@@ -40,7 +40,7 @@ const description = isWorkspaces
 </figure>
 
 <script>
-	// Press the combination first, then apply its effect. Loop only while the figure is visible.
+	// Preview each combination before pressing it, then apply its effect. Loop only while visible.
 	document.querySelectorAll<HTMLElement>('[data-window-management]').forEach((demo) => {
 		const modifier = demo.querySelector<HTMLElement>('[data-modifier]');
 		const keycap = demo.querySelector<HTMLElement>('[data-keycap]');
@@ -73,10 +73,12 @@ const description = isWorkspaces
 
 		const advance = () => {
 			const nextStep = (currentStep + 1) % keys.length;
+			const previewDelay = 500;
+			releaseKeys();
 			selectKey(nextStep);
-			modifier?.classList.add('is-pressed');
 			phaseTimers = [
-				window.setTimeout(() => keycap?.classList.add('is-pressed'), 140),
+				window.setTimeout(() => modifier?.classList.add('is-pressed'), previewDelay),
+				window.setTimeout(() => keycap?.classList.add('is-pressed'), previewDelay + 140),
 				window.setTimeout(() => {
 					currentStep = nextStep;
 					if (demo.dataset.mode === 'workspaces') {
@@ -84,10 +86,10 @@ const description = isWorkspaces
 					} else {
 						demo.dataset.layout = currentStep === 0 ? 'tiles' : 'accordion';
 					}
-				}, 360),
-				window.setTimeout(releaseKeys, 720),
+				}, previewDelay + 360),
+				window.setTimeout(releaseKeys, previewDelay + 720),
 			];
-			loopTimer = window.setTimeout(advance, 2200);
+			loopTimer = window.setTimeout(advance, 2700);
 		};
 
 		const updatePlayback = () => {
@@ -120,7 +122,6 @@ const description = isWorkspaces
 		display: grid;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 		min-height: 14rem;
-		border: 1px solid var(--color-line);
 	}
 
 	.demo-half {
@@ -131,10 +132,6 @@ const description = isWorkspaces
 		justify-content: center;
 		gap: 1.5rem;
 		padding: 1.5rem;
-	}
-
-	.keyboard-half {
-		border-right: 1px solid var(--color-line);
 	}
 
 	.half-label {
@@ -206,7 +203,6 @@ const description = isWorkspaces
 		z-index: 1;
 		transform: translate(-50%, -50%);
 		padding: 0.2rem;
-		background: var(--color-paper);
 		color: var(--color-muted);
 		font-size: 1.2rem;
 		line-height: 1;
@@ -217,7 +213,7 @@ const description = isWorkspaces
 		width: 100%;
 		max-width: 13rem;
 		height: 6rem;
-		border: 1px solid var(--color-ink);
+		background: var(--color-focus);
 	}
 
 	.application-window {
@@ -226,7 +222,8 @@ const description = isWorkspaces
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: var(--color-paper);
+		background: var(--color-focus);
+		color: #fff;
 		font-size: 1rem;
 		font-weight: 500;
 		opacity: 0;
@@ -240,17 +237,16 @@ const description = isWorkspaces
 	}
 
 	.layout-stage {
-		border: 0;
+		background: transparent;
 	}
 
 	.layout-stage .application-window {
 		inset: 0 auto 0 0;
 		width: calc(50% - 0.25rem);
-		border: 1px solid var(--color-ink);
 		opacity: 1;
 		transform: none;
 		font-size: 0.8rem;
-		transition: left 360ms ease, width 360ms ease;
+		transition: left 360ms ease, width 360ms ease, opacity 360ms ease;
 	}
 
 	.layout-stage .application-window:nth-child(2) {
@@ -263,6 +259,10 @@ const description = isWorkspaces
 
 	.window-demo[data-layout='accordion'] .layout-stage .application-window:nth-child(2) {
 		left: 1rem;
+	}
+
+	.window-demo[data-layout='accordion'] .layout-stage .application-window:first-child {
+		opacity: 0.55;
 	}
 
 	figcaption {
