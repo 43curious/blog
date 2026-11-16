@@ -8,12 +8,13 @@ const { devices } = Astro.props;
 
 <div class="audio-pipeline">
 	<span class="audio-source">Mac</span>
+	<svg class="audio-pipe audio-trunk" viewBox="0 0 56 144" preserveAspectRatio="none"><path d="M0 72H14" /></svg>
 	{devices.map((name, index) => (
-		<div class:list={['audio-branch', { 'is-current': index === 0 }]} data-application data-device={name}>
+		<div class="audio-branch" style={`--phase: ${(index - devices.length) * 2.7}s`} data-application data-device={name}>
 			<svg class="audio-pipe" viewBox="0 0 56 144" preserveAspectRatio="none">
 				<path d={index === 0
-					? 'M0 72H14Q22 72 22 64V40Q22 32 30 32H56'
-					: 'M0 72H14Q22 72 22 80V104Q22 112 30 112H56'} />
+					? 'M14 72Q22 72 22 64V40Q22 32 30 32H56'
+					: 'M14 72Q22 72 22 80V104Q22 112 30 112H56'} />
 			</svg>
 			<div class:list={['audio-output', { 'audio-output-secondary': index === 1 }]}>
 				<span class="audio-device">{index === 0 ? name : 'Altavoces'}</span>
@@ -47,11 +48,10 @@ const { devices } = Astro.props;
 		font-size: 0.65rem;
 	}
 
-	.audio-branch { position: absolute; inset: 0; }
-	.audio-branch.is-current { z-index: 1; }
+	.audio-branch { position: absolute; inset: 0; animation: var(--target-animation) var(--shortcut-cycle) linear infinite; animation-delay: var(--phase); }
 	.audio-pipe { position: absolute; top: 0; left: 2.25rem; width: 3rem; height: 9rem; overflow: visible; }
-	.audio-pipe path { fill: none; stroke: var(--color-line); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; transition: stroke 220ms ease; }
-	.audio-branch.is-current .audio-pipe path { stroke: var(--color-focus); }
+	.audio-pipe path { fill: none; stroke: color-mix(in srgb, var(--color-line), var(--color-focus) calc(var(--shortcut-active) * 100%)); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+	.audio-trunk path { stroke: var(--color-focus); }
 
 	.audio-output {
 		position: absolute;
@@ -65,18 +65,15 @@ const { devices } = Astro.props;
 		justify-content: center;
 		gap: 0.2rem;
 		padding: 0.5rem;
-		background: var(--color-soft);
-		color: var(--color-muted);
+		background: color-mix(in srgb, var(--color-soft), var(--color-focus) calc(var(--shortcut-active) * 100%));
+		color: color-mix(in srgb, var(--color-muted), #fff calc(var(--shortcut-active) * 100%));
 		text-align: center;
 		line-height: 1.3;
-		transition: background 220ms ease, color 220ms ease;
 	}
 
 	.audio-output-secondary { top: 5rem; }
 	.audio-device { font-size: 0.8rem; font-weight: 500; }
-	.audio-device-note { font-size: 0.6rem; }
-	.audio-branch.is-current .audio-output { background: var(--color-focus); color: #fff; }
-	.audio-branch.is-current .audio-device-note { color: rgb(255 255 255 / 0.75); }
+	.audio-device-note { font-size: 0.6rem; opacity: calc(1 - 0.25 * var(--shortcut-active)); }
 
 	@media (max-width: 480px) {
 		.audio-source { width: 1.5rem; height: 1.8rem; font-size: 0.55rem; }
@@ -87,6 +84,7 @@ const { devices } = Astro.props;
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.audio-pipe path, .audio-output { transition: none; }
+		.audio-branch { animation: none; --shortcut-active: 0; }
+		.audio-branch:first-of-type { --shortcut-active: 1; }
 	}
 </style>

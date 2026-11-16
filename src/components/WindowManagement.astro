@@ -1,5 +1,6 @@
 ---
 import AudioRouting from './AudioRouting.astro';
+import '../styles/shortcut-animations.css';
 
 interface Props {
 	mode: 'workspaces' | 'layouts' | 'focus' | 'audio';
@@ -35,7 +36,7 @@ const { shortcuts, targets, description, label } = {
 }[mode];
 ---
 
-<figure class="window-demo" data-window-management data-mode={mode} data-layout="tiles" aria-label={description}>
+<figure class="window-demo" data-window-management data-mode={mode} data-steps={shortcuts.length} aria-label={description}>
 	<div class="demo-stage" aria-hidden="true">
 		<div class="demo-half">
 			<span class="half-label">Combinación</span>
@@ -44,7 +45,7 @@ const { shortcuts, targets, description, label } = {
 				<span class="key-plus">+</span>
 				<kbd class="keycap combo-key" data-keycap>
 					{shortcuts.map((key, index) => (
-						<span class:list={['key-value', { 'is-current': index === 0 }]} data-key-value>{key}</span>
+						<span class="key-value" style={`--phase: ${(index - shortcuts.length) * 2.7}s`} data-key-value>{key}</span>
 					))}
 				</kbd>
 			</div>
@@ -57,7 +58,7 @@ const { shortcuts, targets, description, label } = {
 			) : (
 				<div class:list={['application-stage', { 'layout-stage': hasTwoWindows, 'focus-stage': mode === 'focus' }]}>
 					{targets.map((name, index) => (
-						<div class:list={['application-window', { 'is-current': index === 0 }]} data-application>{name}</div>
+						<div class="application-window" style={`--phase: ${(index - targets.length) * 2.7}s`} data-application>{name}</div>
 					))}
 				</div>
 			)}
@@ -66,95 +67,19 @@ const { shortcuts, targets, description, label } = {
 	<figcaption>{description}</figcaption>
 </figure>
 
-<script>
-	// Change the key after its release transition finishes. Loop only while visible.
-	document.querySelectorAll<HTMLElement>('[data-window-management]').forEach((demo) => {
-		const modifier = demo.querySelector<HTMLElement>('[data-modifier]');
-		const keycap = demo.querySelector<HTMLElement>('[data-keycap]');
-		const keys = Array.from(demo.querySelectorAll<HTMLElement>('[data-key-value]'));
-		const applications = Array.from(demo.querySelectorAll<HTMLElement>('[data-application]'));
-		const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
-		let currentStep = 0;
-		let appliedStep = 0;
-		let inView = false;
-		let playing = false;
-		let pendingStep: number | undefined;
-		let loopTimer: number | undefined;
-		let phaseTimers: number[] = [];
-
-		const selectKey = (step: number) => {
-			keys.forEach((key, index) => key.classList.toggle('is-current', index === step));
-		};
-
-		const releaseKeys = () => {
-			modifier?.classList.remove('is-pressed');
-			keycap?.classList.remove('is-pressed');
-		};
-
-		keycap?.addEventListener('transitionend', (event) => {
-			if (!keycap || event.target !== keycap || event.propertyName !== 'transform') return;
-			if (keycap.classList.contains('is-pressed') || pendingStep === undefined) return;
-			currentStep = pendingStep;
-			pendingStep = undefined;
-			selectKey(currentStep);
-		});
-
-		const stop = () => {
-			window.clearTimeout(loopTimer);
-			phaseTimers.forEach(window.clearTimeout);
-			phaseTimers = [];
-			playing = false;
-			pendingStep = undefined;
-			releaseKeys();
-			currentStep = appliedStep;
-			selectKey(currentStep);
-		};
-
-		const advance = () => {
-			const step = currentStep;
-			const previewDelay = 500;
-			phaseTimers = [
-				window.setTimeout(() => modifier?.classList.add('is-pressed'), previewDelay),
-				window.setTimeout(() => keycap?.classList.add('is-pressed'), previewDelay + 140),
-				window.setTimeout(() => {
-					appliedStep = step;
-					if (demo.dataset.mode === 'layouts') {
-						demo.dataset.layout = step === 0 ? 'tiles' : 'accordion';
-					} else {
-						applications.forEach((app, index) => app.classList.toggle('is-current', index === step));
-					}
-				}, previewDelay + 360),
-				window.setTimeout(() => {
-					pendingStep = (step + 1) % keys.length;
-					releaseKeys();
-				}, previewDelay + 720),
-			];
-			loopTimer = window.setTimeout(advance, 2700);
-		};
-
-		const updatePlayback = () => {
-			if (!inView || document.hidden || motionPreference.matches) {
-				stop();
-			} else if (!playing) {
-				playing = true;
-				loopTimer = window.setTimeout(advance, 700);
-			}
-		};
-
-		const observer = new IntersectionObserver(([entry]) => {
-			inView = entry.intersectionRatio >= 0.25;
-			updatePlayback();
-		}, { threshold: 0.25 });
-		observer.observe(demo);
-		motionPreference.addEventListener('change', updatePlayback);
-		document.addEventListener('visibilitychange', updatePlayback);
-	});
-</script>
-
 <style>
 	.window-demo {
+		--shortcut-cycle: 5.4s;
+		--target-animation: shortcut-target-two;
+		--label-animation: shortcut-label-two;
 		margin: 2rem 0;
 		max-width: 48rem;
+	}
+
+	.window-demo[data-steps='3'] {
+		--shortcut-cycle: 8.1s;
+		--target-animation: shortcut-target-three;
+		--label-animation: shortcut-label-three;
 	}
 
 	.demo-stage {
@@ -205,20 +130,24 @@ const { shortcuts, targets, description, label } = {
 		font-family: var(--font-mono);
 		font-size: 1rem;
 		line-height: 1;
-		transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease, color 120ms ease, border-color 120ms ease;
+		animation: shortcut-letter-press 2.7s ease infinite;
 	}
 
 	.window-demo .modifier-key {
 		width: 4.5rem;
 		font-size: 0.85rem;
+		animation-name: shortcut-modifier-press;
 	}
 
-	.window-demo .keycap.is-pressed {
-		transform: translateY(4px);
-		border-color: var(--color-focus);
-		background: var(--color-focus);
-		box-shadow: 0 0 0 var(--color-line);
-		color: #fff;
+	/* Press Ctrl at 0.5s and the letter at 0.64s; both return by 1.34s. */
+	@keyframes shortcut-modifier-press {
+		0%, 18.518519%, 49.62963%, 100% { transform: translateY(0); background: var(--color-paper); color: var(--color-ink); border-color: var(--color-line); box-shadow: 0 4px 0 var(--color-line); }
+		22.962963%, 45.185185% { transform: translateY(4px); background: var(--color-focus); color: #fff; border-color: var(--color-focus); box-shadow: 0 0 0 var(--color-line); }
+	}
+
+	@keyframes shortcut-letter-press {
+		0%, 23.703704%, 49.62963%, 100% { transform: translateY(0); background: var(--color-paper); color: var(--color-ink); border-color: var(--color-line); box-shadow: 0 4px 0 var(--color-line); }
+		28.148148%, 45.185185% { transform: translateY(4px); background: var(--color-focus); color: #fff; border-color: var(--color-focus); box-shadow: 0 0 0 var(--color-line); }
 	}
 
 	.key-plus {
@@ -230,10 +159,8 @@ const { shortcuts, targets, description, label } = {
 	.key-value {
 		position: absolute;
 		opacity: 0;
-	}
-
-	.key-value.is-current {
-		opacity: 1;
+		animation: var(--label-animation) var(--shortcut-cycle) steps(1, end) infinite;
+		animation-delay: var(--phase);
 	}
 
 	.demo-arrow {
@@ -266,14 +193,10 @@ const { shortcuts, targets, description, label } = {
 		color: #fff;
 		font-size: 1rem;
 		font-weight: 500;
-		opacity: 0;
-		transform: translateY(0.4rem);
-		transition: opacity 260ms ease, transform 260ms ease;
-	}
-
-	.application-window.is-current {
-		opacity: 1;
-		transform: translateY(0);
+		opacity: var(--shortcut-active);
+		transform: translateY(calc((1 - var(--shortcut-active)) * 0.4rem));
+		animation: var(--target-animation) var(--shortcut-cycle) linear infinite;
+		animation-delay: var(--phase);
 	}
 
 	.window-demo[data-mode='audio'] .key-combo {
@@ -290,31 +213,33 @@ const { shortcuts, targets, description, label } = {
 		opacity: 1;
 		transform: none;
 		font-size: 0.8rem;
-		transition: left 360ms ease, width 360ms ease, opacity 360ms ease;
 	}
 
 	.layout-stage .application-window:nth-child(2) {
 		left: calc(50% + 0.25rem);
 	}
 
-	.window-demo[data-layout='accordion'] .layout-stage .application-window {
-		width: calc(100% - 1rem);
+	.window-demo[data-mode='layouts'] .application-window {
+		animation: accordion-layout var(--shortcut-cycle) ease infinite;
 	}
 
-	.window-demo[data-layout='accordion'] .layout-stage .application-window:nth-child(2) {
-		left: 1rem;
+	.window-demo[data-mode='layouts'] .application-window:nth-child(2) {
+		animation-name: accordion-front;
 	}
 
-	.window-demo[data-layout='accordion'] .layout-stage .application-window:first-child {
-		opacity: 0.55;
+	/* Ctrl+W applies at 3.56s; Ctrl+Q restores tiles at 0.86s of the next loop. */
+	@keyframes accordion-layout {
+		0%, 15.925926%, 72.592593%, 100% { width: calc(100% - 2rem); opacity: 0.55; }
+		22.592593%, 65.925926% { width: calc(50% - 0.375rem); opacity: 1; }
+	}
+
+	@keyframes accordion-front {
+		0%, 15.925926%, 72.592593%, 100% { left: 2rem; width: calc(100% - 2rem); }
+		22.592593%, 65.925926% { left: calc(50% + 0.375rem); width: calc(50% - 0.375rem); }
 	}
 
 	.focus-stage .application-window {
-		opacity: 0.35;
-	}
-
-	.focus-stage .application-window.is-current {
-		opacity: 1;
+		opacity: calc(0.35 + 0.65 * var(--shortcut-active));
 	}
 
 	figcaption {
@@ -334,7 +259,19 @@ const { shortcuts, targets, description, label } = {
 		.layout-stage .application-window { font-size: 0.7rem; }
 	}
 
+	@media (max-width: 360px) {
+		.demo-half { padding-inline: 0.5rem; }
+		.key-combo { gap: 0.35rem; }
+		.window-demo .modifier-key { width: 3rem; }
+		.window-demo .combo-key { width: 2rem; }
+	}
+
 	@media (prefers-reduced-motion: reduce) {
-		.window-demo .keycap, .window-demo .application-window { transition: none; }
+		.window-demo .keycap, .window-demo .key-value, .window-demo .application-window { animation: none !important; }
+		.key-value:first-child { opacity: 1; }
+		.application-window { --shortcut-active: 0; }
+		.application-window:first-child { --shortcut-active: 1; }
+		.window-demo[data-mode='layouts'] .application-window { width: calc(50% - 0.375rem); opacity: 1; }
+		.window-demo[data-mode='layouts'] .application-window:nth-child(2) { left: calc(50% + 0.375rem); }
 	}
 </style>

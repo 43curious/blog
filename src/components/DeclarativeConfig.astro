@@ -6,7 +6,7 @@ const applications = [
 ];
 ---
 
-<figure class="declarative-demo" data-declarative-config data-listed="false" data-installed="false" data-change="none">
+<figure class="declarative-demo" data-declarative-config>
 	<div class="demo-stage" aria-hidden="true">
 		<div class="demo-half">
 			<span class="half-label">Brewfile</span>
@@ -18,9 +18,9 @@ const applications = [
 						</div>
 					))}
 					<div class="configuration-entry changed-entry">
-						<span class="entry-sign" data-change-sign></span><span class="entry-text">cask "blender"</span>
+						<span class="entry-sign"><span class="add-sign">+</span><span class="remove-sign">−</span></span><span class="entry-text">cask "blender"</span>
 					</div>
-					<span class="inventory-count" data-list-count>3 entradas</span>
+					<span class="inventory-count list-count"><span>3 entradas</span><span class="count-four">4 entradas</span></span>
 				</div>
 			</div>
 		</div>
@@ -39,7 +39,7 @@ const applications = [
 							<span class="dock-icon">B</span>
 						</div>
 					</div>
-					<span class="inventory-count" data-dock-count>3 aplicaciones</span>
+					<span class="inventory-count dock-count"><span>3 aplicaciones</span><span class="count-four">4 aplicaciones</span></span>
 				</div>
 			</div>
 		</div>
@@ -47,79 +47,12 @@ const applications = [
 	<figcaption>Añadir → instalar. Quitar → retirar al sincronizar con limpieza.</figcaption>
 </figure>
 
-<script>
-	interface Frame {
-		listed: boolean;
-		installed: boolean;
-		change: 'none' | 'add' | 'remove';
-		duration: number;
-	}
-
-	// Edit the declaration first; reconcile the applications after a short, visible delay.
-	const frames: Frame[] = [
-		{ listed: false, installed: false, change: 'none', duration: 650 },
-		{ listed: true, installed: false, change: 'add', duration: 550 },
-		{ listed: true, installed: true, change: 'add', duration: 650 },
-		{ listed: true, installed: true, change: 'none', duration: 1100 },
-		{ listed: true, installed: true, change: 'remove', duration: 550 },
-		{ listed: false, installed: true, change: 'remove', duration: 350 },
-		{ listed: false, installed: false, change: 'remove', duration: 850 },
-	];
-
-	document.querySelectorAll<HTMLElement>('[data-declarative-config]').forEach((demo) => {
-		const changeSign = demo.querySelector<HTMLElement>('[data-change-sign]');
-		const listCount = demo.querySelector<HTMLElement>('[data-list-count]');
-		const dockCount = demo.querySelector<HTMLElement>('[data-dock-count]');
-		const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
-		let frameIndex = 0;
-		let timer: number | undefined;
-		let inView = false;
-		let playing = false;
-
-		const render = (frame: Frame) => {
-			demo.dataset.listed = String(frame.listed);
-			demo.dataset.installed = String(frame.installed);
-			demo.dataset.change = frame.change;
-			if (changeSign) changeSign.textContent = frame.change === 'add' ? '+' : frame.change === 'remove' ? '−' : '';
-			if (listCount) listCount.textContent = `${frame.listed ? 4 : 3} entradas`;
-			if (dockCount) dockCount.textContent = `${frame.installed ? 4 : 3} aplicaciones`;
-		};
-
-		const advance = () => {
-			const frame = frames[frameIndex];
-			render(frame);
-			frameIndex = (frameIndex + 1) % frames.length;
-			timer = window.setTimeout(advance, frame.duration);
-		};
-
-		const updatePlayback = () => {
-			if (!inView || document.hidden || motionPreference.matches) {
-				window.clearTimeout(timer);
-				playing = false;
-				if (motionPreference.matches) {
-					render({ listed: true, installed: true, change: 'none', duration: 0 });
-					frameIndex = 0;
-				}
-			} else if (!playing) {
-				playing = true;
-				timer = window.setTimeout(advance, 350);
-			}
-		};
-
-		const observer = new IntersectionObserver(([entry]) => {
-			inView = entry.intersectionRatio >= 0.25;
-			updatePlayback();
-		}, { threshold: 0.25 });
-		observer.observe(demo);
-		motionPreference.addEventListener('change', updatePlayback);
-		document.addEventListener('visibilitychange', updatePlayback);
-	});
-</script>
 
 <style>
 	.declarative-demo {
 		--addition: light-dark(#15803d, #4ade80);
 		--removal: light-dark(#b91c1c, #f87171);
+		--configuration-cycle: 4.7s;
 		margin: 2rem 0;
 		max-width: 48rem;
 	}
@@ -130,14 +63,17 @@ const applications = [
 	.content-stage { display: flex; width: 100%; height: 9rem; align-items: center; justify-content: center; }
 	.configuration-list { width: 100%; max-width: 13rem; }
 	.configuration-entry { display: flex; height: 1.6rem; align-items: center; padding: 0.2rem 0.3rem; overflow: hidden; color: var(--color-muted); font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.2rem; white-space: nowrap; }
-	.entry-sign { flex: 0 0 1rem; }
-	.changed-entry { height: 0; padding-block: 0; opacity: 0; transition: height 240ms ease, padding 240ms ease, opacity 240ms ease, background 180ms ease, color 180ms ease; }
-	.declarative-demo[data-listed='true'] .changed-entry { height: 1.6rem; padding-block: 0.2rem; opacity: 1; }
-	.declarative-demo[data-change='add'] .changed-entry { background: color-mix(in srgb, var(--addition) 10%, transparent); color: var(--addition); }
-	.declarative-demo[data-change='remove'] .changed-entry { background: color-mix(in srgb, var(--removal) 10%, transparent); color: var(--removal); }
-	.declarative-demo[data-change='remove'] .entry-text { text-decoration: line-through; }
-	.inventory-count { display: block; margin-top: 0.65rem; color: var(--color-muted); font-size: 0.6rem; line-height: 1rem; }
-	.configuration-list > .inventory-count { padding-left: 1.3rem; }
+	.entry-sign { position: relative; flex: 0 0 1rem; height: 1.2rem; }
+	.entry-sign > span { position: absolute; inset: 0; opacity: 0; }
+	.add-sign { animation: configuration-add-sign var(--configuration-cycle) steps(1, end) infinite; }
+	.remove-sign { animation: configuration-remove-sign var(--configuration-cycle) steps(1, end) infinite; }
+	.changed-entry { height: 0; padding-block: 0; opacity: 0; animation: configuration-entry var(--configuration-cycle) linear infinite, configuration-color var(--configuration-cycle) linear infinite; }
+	.entry-text { text-decoration: line-through; text-decoration-color: transparent; animation: configuration-delete-mark var(--configuration-cycle) linear infinite; }
+	.inventory-count { position: relative; display: block; height: 1rem; margin-top: 0.65rem; color: var(--color-muted); font-size: 0.6rem; line-height: 1rem; }
+	.configuration-list > .inventory-count { margin-left: 1.3rem; }
+	.count-four { position: absolute; inset: 0; background: var(--color-paper); opacity: 0; }
+	.list-count .count-four { animation: configuration-list-count var(--configuration-cycle) steps(1, end) infinite; }
+	.dock-count .count-four { animation: configuration-dock-count var(--configuration-cycle) steps(1, end) infinite; }
 	.demo-arrow { position: absolute; top: calc(50% + 1rem); left: 50%; transform: translate(-50%, -50%); padding: 0.2rem; color: var(--color-muted); font-size: 1.2rem; line-height: 1; }
 	.dock-preview { position: relative; }
 	.dock-preview > .inventory-count { position: absolute; top: 100%; width: 100%; text-align: center; }
@@ -152,23 +88,52 @@ const applications = [
 	}
 
 	.dock-slot { display: flex; flex: none; width: calc(var(--dock-size) + var(--dock-gap)); height: var(--dock-size); align-items: center; justify-content: center; }
-	.dock-icon { display: flex; flex: none; width: var(--dock-size); height: var(--dock-size); align-items: center; justify-content: center; border-radius: 0.25rem; background: var(--color-focus); color: #fff; font-family: var(--font-mono); font-size: clamp(0.65rem, 1.4vw, 0.85rem); line-height: 1; transition: background 180ms ease, color 180ms ease; }
-	.changed-slot { width: 0; overflow: hidden; opacity: 0; transform: translateY(0.5rem) scale(0.8); transition: width 260ms ease, opacity 220ms ease, transform 260ms ease; }
-	.declarative-demo[data-installed='true'] .changed-slot { width: calc(var(--dock-size) + var(--dock-gap)); opacity: 1; transform: translateY(0) scale(1); }
-	.declarative-demo[data-change='add'] .changed-slot .dock-icon { background: var(--addition); color: var(--color-paper); }
-	.declarative-demo[data-change='remove'] .changed-slot .dock-icon { background: var(--removal); color: var(--color-paper); }
+	.dock-icon { display: flex; flex: none; width: var(--dock-size); height: var(--dock-size); align-items: center; justify-content: center; border-radius: 0.25rem; background: var(--color-focus); color: #fff; font-family: var(--font-mono); font-size: clamp(0.65rem, 1.4vw, 0.85rem); line-height: 1; }
+	.changed-slot { width: 0; overflow: hidden; opacity: 0; transform: translateY(0.5rem) scale(0.8); animation: configuration-install var(--configuration-cycle) linear infinite; }
+	.changed-slot .dock-icon { animation: configuration-icon-color var(--configuration-cycle) linear infinite; }
 	figcaption { margin-top: 0.65rem; color: var(--color-muted); font-size: 0.7rem; line-height: 1.6; }
+
+	/* 4.7s loop: add at 0.65s, install at 1.2s, remove the entry at 3.5s and the app at 3.85s. */
+	@keyframes configuration-entry {
+		0%, 13.829787%, 79.574468%, 100% { height: 0; padding-block: 0; opacity: 0; }
+		18.93617%, 74.468085% { height: 1.6rem; padding-block: 0.2rem; opacity: 1; }
+	}
+	@keyframes configuration-install {
+		0%, 25.531915%, 87.446809%, 100% { width: 0; opacity: 0; transform: translateY(0.5rem) scale(0.8); }
+		31.06383%, 81.914894% { width: calc(var(--dock-size) + var(--dock-gap)); opacity: 1; transform: translateY(0) scale(1); }
+	}
+	@keyframes configuration-color {
+		0%, 39.361702% { background: color-mix(in srgb, var(--addition) 10%, transparent); color: var(--addition); }
+		43.191489%, 62.765957% { background: transparent; color: var(--color-muted); }
+		66.595745%, 100% { background: color-mix(in srgb, var(--removal) 10%, transparent); color: var(--removal); }
+	}
+	@keyframes configuration-icon-color {
+		0%, 39.361702% { background: var(--addition); color: var(--color-paper); }
+		43.191489%, 62.765957% { background: var(--color-focus); color: #fff; }
+		66.595745%, 100% { background: var(--removal); color: var(--color-paper); }
+	}
+	@keyframes configuration-delete-mark {
+		0%, 62.765957% { text-decoration-color: transparent; }
+		66.595745%, 100% { text-decoration-color: var(--removal); }
+	}
+	@keyframes configuration-add-sign { 0% { opacity: 1; } 39.361702%, 100% { opacity: 0; } }
+	@keyframes configuration-remove-sign { 0% { opacity: 0; } 62.765957%, 100% { opacity: 1; } }
+	@keyframes configuration-list-count { 0%, 74.468085%, 100% { opacity: 0; } 13.829787% { opacity: 1; } }
+	@keyframes configuration-dock-count { 0%, 81.914894%, 100% { opacity: 0; } 25.531915% { opacity: 1; } }
 
 	@media (max-width: 480px) {
 		.demo-stage { min-height: 15rem; }
 		.demo-half { gap: 1.25rem; padding: 1rem; }
 		.configuration-entry { padding-inline: 0.2rem; font-size: 0.65rem; }
 		.entry-sign { flex-basis: 0.75rem; }
-		.configuration-list > .inventory-count { padding-left: 0.95rem; }
+		.configuration-list > .inventory-count { margin-left: 0.95rem; }
 		.dock { padding: 0.4rem; }
 	}
-
+	@media (max-width: 360px) {
+		.demo-half { padding-inline: 0.5rem; }
+	}
 	@media (prefers-reduced-motion: reduce) {
-		.changed-entry, .changed-slot, .dock-icon { transition: none; }
+		.declarative-demo * { animation: none !important; }
+		.changed-entry { background: transparent; color: var(--color-muted); }
 	}
 </style>

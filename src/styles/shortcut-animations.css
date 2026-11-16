@@ -1,0 +1,28 @@
+/* A shared 2.7s step keeps key presses, labels and their effects synchronized. */
+@property --shortcut-active {
+	syntax: '<number>';
+	inherits: true;
+	initial-value: 0;
+}
+
+/* Each target becomes active 0.86s into its step, with a 0.26s fade. */
+@keyframes shortcut-target-two {
+	0%, 15.925926%, 70.740741%, 100% { --shortcut-active: 0; }
+	20.740741%, 65.925926% { --shortcut-active: 1; }
+}
+
+@keyframes shortcut-target-three {
+	0%, 10.617284%, 47.160494%, 100% { --shortcut-active: 0; }
+	13.82716%, 43.950617% { --shortcut-active: 1; }
+}
+
+/* The next label appears at 1.34s, after the 0.12s release finishes. */
+@keyframes shortcut-label-two {
+	0%, 74.814815%, 100% { opacity: 1; }
+	24.814815% { opacity: 0; }
+}
+
+@keyframes shortcut-label-three {
+	0%, 83.209877%, 100% { opacity: 1; }
+	16.54321% { opacity: 0; }
+}

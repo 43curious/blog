@@ -3,16 +3,32 @@ const projects = [
 	'WaveSearch', 'Web de vídeo', 'Web del curso', 'Workflows', 'Web personal',
 	'TaldeBOT', 'Iko-Connect', 'tresna', 'Blog', 'Dotfiles', 'Recursos', 'Audio',
 ];
+const word = 'wvs';
+const matchClasses = ['', 'match-first', 'match-second', 'match-third'];
+
+// Prepare the fixed example at build time; the browser only animates the markup.
+const results = projects.map((name) => {
+	const positions: number[] = [];
+	let start = 0;
+	for (const letter of word) {
+		const position = name.toLowerCase().indexOf(letter, start);
+		if (position < 0) break;
+		positions.push(position);
+		start = position + 1;
+	}
+	return { name, positions };
+});
+const counts = [0, 1, 2, 3].map((length) => results.filter((result) => result.positions.length >= length).length);
 ---
 
-<figure class="fuzzy-demo" data-fuzzy-finding data-opened="false">
+<figure class="fuzzy-demo" data-fuzzy-finding>
 	<div class="demo-stage" aria-hidden="true">
 		<div class="demo-half">
 			<span class="half-label">Búsqueda</span>
 			<div class="search-controls">
 				<div class="query-line">
 					<span class="query-prompt">&gt;</span>
-					<span data-query></span><span class="query-cursor"></span>
+					<span class="query-text">{word}</span><span class="query-cursor"></span>
 				</div>
 			</div>
 		</div>
@@ -21,12 +37,14 @@ const projects = [
 			<span class="half-label">Proyectos</span>
 			<div class="results-stage">
 				<div class="result-list">
-					{projects.map((name) => (
-						<div class="result" data-result data-name={name}>
-							{Array.from(name).map((letter) => <span data-letter>{letter}</span>)}
+					{results.map(({ name, positions }) => (
+						<div class="result" data-match-level={positions.length} data-name={name}>
+							{Array.from(name).map((letter, index) => <span class={matchClasses[positions.indexOf(index) + 1]}>{letter}</span>)}
 						</div>
 					))}
-					<span class="result-count" data-result-count>{projects.length} proyectos</span>
+					<div class="result-count">
+						{counts.map((count, index) => <span class={`count-state count-${index}`}>{count} {count === 1 ? 'proyecto' : 'proyectos'}</span>)}
+					</div>
 				</div>
 				<div class="opened-result">WaveSearch</div>
 			</div>
@@ -35,118 +53,86 @@ const projects = [
 	<figcaption>wvs → WaveSearch. Las letras coinciden en orden, aunque estén separadas.</figcaption>
 </figure>
 
-<script>
-	interface Frame {
-		query: string;
-		duration: number;
-		opened?: boolean;
-	}
-
-	const word = 'wvs';
-	// Type quickly at the prompt, then leave time to read and open the result.
-	const frames: Frame[] = [
-		{ query: '', duration: 600 },
-		{ query: 'w', duration: 180 },
-		{ query: 'wv', duration: 180 },
-		{ query: word, duration: 700 },
-		{ query: word, opened: true, duration: 1100 },
-	];
-
-	// Return the matching character positions, or null when the query is not a subsequence.
-	const matchLetters = (name: string, query: string): number[] | null => {
-		const positions: number[] = [];
-		let start = 0;
-		for (const letter of query) {
-			const position = name.toLowerCase().indexOf(letter, start);
-			if (position < 0) return null;
-			positions.push(position);
-			start = position + 1;
-		}
-		return positions;
-	};
-
-	document.querySelectorAll<HTMLElement>('[data-fuzzy-finding]').forEach((demo) => {
-		const queryText = demo.querySelector<HTMLElement>('[data-query]');
-		const resultCount = demo.querySelector<HTMLElement>('[data-result-count]');
-		const rows = Array.from(demo.querySelectorAll<HTMLElement>('[data-result]')).map((row) => ({
-			row,
-			name: row.dataset.name ?? '',
-			letters: Array.from(row.querySelectorAll<HTMLElement>('[data-letter]')),
-		}));
-		const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
-		let frameIndex = 0;
-		let timer: number | undefined;
-		let inView = false;
-		let playing = false;
-
-		const render = (frame: Frame) => {
-			if (queryText) queryText.textContent = frame.query;
-			demo.dataset.opened = String(frame.opened ?? false);
-			let count = 0;
-			rows.forEach(({ row, name, letters }) => {
-				const matches = matchLetters(name, frame.query);
-				if (matches !== null) count++;
-				row.classList.toggle('is-hidden', matches === null);
-				row.classList.toggle('is-selected', frame.query === word && matches !== null);
-				letters.forEach((letter, index) => letter.classList.toggle('is-match', matches?.includes(index) ?? false));
-			});
-			if (resultCount) resultCount.textContent = `${count} ${count === 1 ? 'proyecto' : 'proyectos'}`;
-		};
-
-		const advance = () => {
-			const frame = frames[frameIndex];
-			render(frame);
-			frameIndex = (frameIndex + 1) % frames.length;
-			timer = window.setTimeout(advance, frame.duration);
-		};
-
-		const updatePlayback = () => {
-			if (!inView || document.hidden || motionPreference.matches) {
-				window.clearTimeout(timer);
-				playing = false;
-				if (motionPreference.matches) {
-					render({ query: word, duration: 0 });
-					frameIndex = 0;
-				}
-			} else if (!playing) {
-				playing = true;
-				timer = window.setTimeout(advance, 350);
-			}
-		};
-
-		const observer = new IntersectionObserver(([entry]) => {
-			inView = entry.intersectionRatio >= 0.25;
-			updatePlayback();
-		}, { threshold: 0.25 });
-		observer.observe(demo);
-		motionPreference.addEventListener('change', updatePlayback);
-		document.addEventListener('visibilitychange', updatePlayback);
-	});
-</script>
-
 <style>
-	.fuzzy-demo { margin: 2rem 0; max-width: 48rem; }
+	.fuzzy-demo { --fuzzy-cycle: 2.76s; margin: 2rem 0; max-width: 48rem; }
 	.demo-stage { position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); min-height: 22rem; }
 	.demo-half { display: flex; min-width: 0; flex-direction: column; align-items: center; justify-content: center; gap: 1.5rem; padding: 1.5rem; }
 	.half-label { color: var(--color-muted); font-size: 0.6rem; line-height: 1; letter-spacing: 0.12em; text-transform: uppercase; }
 	.search-controls { display: flex; height: 16rem; align-items: center; justify-content: center; }
 	.query-line { display: flex; align-items: center; min-width: 5.5rem; height: 1.5rem; font-family: var(--font-mono); font-size: 1.1rem; }
 	.query-prompt { margin-right: 0.7rem; color: var(--color-focus); }
+	.query-text { display: inline-block; width: 0; overflow: hidden; white-space: nowrap; animation: fuzzy-query var(--fuzzy-cycle) steps(1, end) infinite; }
 	.query-cursor { width: 1px; height: 1.1rem; margin-left: 0.2rem; background: var(--color-focus); }
-
 	.demo-arrow { position: absolute; top: calc(50% + 1rem); left: 50%; transform: translate(-50%, -50%); padding: 0.2rem; color: var(--color-muted); font-size: 1.2rem; line-height: 1; }
 	.results-stage { position: relative; width: 100%; max-width: 13rem; height: 16rem; }
-	.result-list { position: absolute; top: 50%; width: 100%; transform: translateY(-50%); transition: opacity 160ms ease; }
-	.result { height: 1.2rem; padding: 0.1rem 0.6rem; overflow: hidden; color: var(--color-muted); font-family: var(--font-mono); font-size: 0.8rem; line-height: 1rem; white-space: nowrap; transition: height 160ms ease, padding 160ms ease, opacity 160ms ease, background 160ms ease, color 160ms ease; }
-	.result.is-hidden { height: 0; padding-block: 0; opacity: 0; }
-	.result .is-match { color: var(--color-focus); font-weight: 700; }
-	.result.is-selected { background: var(--color-focus); color: #fff; }
-	.result.is-selected .is-match { color: inherit; text-decoration: underline; text-underline-offset: 0.15em; }
-	.result-count { display: block; margin-top: 0.4rem; padding-left: 0.6rem; color: var(--color-muted); font-size: 0.6rem; line-height: 1rem; }
-	.opened-result { position: absolute; top: 50%; display: flex; width: 100%; height: 6rem; align-items: center; justify-content: center; background: var(--color-focus); color: #fff; font-size: 1rem; font-weight: 500; opacity: 0; transform: translateY(calc(-50% + 0.4rem)); transition: opacity 160ms ease, transform 160ms ease; }
-	.fuzzy-demo[data-opened='true'] .result-list { opacity: 0; }
-	.fuzzy-demo[data-opened='true'] .opened-result { opacity: 1; transform: translateY(-50%); }
+	.result-list { position: absolute; top: 50%; width: 100%; transform: translateY(-50%); animation: fuzzy-list var(--fuzzy-cycle) linear infinite; }
+	.result { height: 1.2rem; padding: 0.1rem 0.6rem; overflow: hidden; color: var(--color-muted); font-family: var(--font-mono); font-size: 0.8rem; line-height: 1rem; white-space: nowrap; animation-duration: var(--fuzzy-cycle); animation-timing-function: linear; animation-iteration-count: infinite; }
+	.result[data-match-level='0'] { animation-name: fuzzy-row-first; }
+	.result[data-match-level='1'] { animation-name: fuzzy-row-second; }
+	.result[data-match-level='2'] { animation-name: fuzzy-row-third; }
+	.result[data-match-level='3'] { animation-name: fuzzy-selection; }
+	.match-first, .match-second, .match-third { text-decoration: underline; text-decoration-color: transparent; animation-duration: var(--fuzzy-cycle); animation-timing-function: linear; animation-iteration-count: infinite; }
+	.match-first { animation-name: fuzzy-match-first; }
+	.match-second { animation-name: fuzzy-match-second; }
+	.match-third { animation-name: fuzzy-match-third; }
+	.result-count { position: relative; height: 1rem; margin-top: 0.4rem; padding-left: 0.6rem; color: var(--color-muted); font-size: 0.6rem; line-height: 1rem; }
+	.count-state { position: absolute; opacity: 0; animation-duration: var(--fuzzy-cycle); animation-timing-function: steps(1, end); animation-iteration-count: infinite; }
+	.count-0 { animation-name: fuzzy-count-all; }
+	.count-1 { animation-name: fuzzy-count-first; }
+	.count-2 { animation-name: fuzzy-count-second; }
+	.count-3 { animation-name: fuzzy-count-third; }
+	.opened-result { position: absolute; top: 50%; display: flex; width: 100%; height: 6rem; align-items: center; justify-content: center; background: var(--color-focus); color: #fff; font-size: 1rem; font-weight: 500; opacity: 0; transform: translateY(calc(-50% + 0.4rem)); animation: fuzzy-open var(--fuzzy-cycle) linear infinite; }
 	figcaption { margin-top: 0.65rem; color: var(--color-muted); font-size: 0.7rem; line-height: 1.6; }
+
+	/* 2.76s loop: type at 0.6 / 0.78 / 0.96s, open at 1.66s. */
+	@keyframes fuzzy-query {
+		0% { width: 0; }
+		21.73913% { width: 1ch; }
+		28.26087% { width: 2ch; }
+		34.782609%, 100% { width: 3ch; }
+	}
+	@keyframes fuzzy-list {
+		0%, 65.942029%, 100% { opacity: 0; }
+		5.797101%, 60.144928% { opacity: 1; }
+	}
+	@keyframes fuzzy-open {
+		0%, 60.144928% { opacity: 0; transform: translateY(calc(-50% + 0.4rem)); }
+		65.942029%, 100% { opacity: 1; transform: translateY(-50%); }
+	}
+	@keyframes fuzzy-row-first {
+		0%, 27.536232%, 100% { height: 0; padding-block: 0; opacity: 0; }
+		5.797101%, 21.73913% { height: 1.2rem; padding-block: 0.1rem; opacity: 1; }
+	}
+	@keyframes fuzzy-row-second {
+		0%, 34.057971%, 100% { height: 0; padding-block: 0; opacity: 0; }
+		5.797101%, 28.26087% { height: 1.2rem; padding-block: 0.1rem; opacity: 1; }
+	}
+	@keyframes fuzzy-row-third {
+		0%, 40.57971%, 100% { height: 0; padding-block: 0; opacity: 0; }
+		5.797101%, 34.782609% { height: 1.2rem; padding-block: 0.1rem; opacity: 1; }
+	}
+	@keyframes fuzzy-selection {
+		0%, 34.782609% { background: transparent; color: var(--color-muted); }
+		40.57971%, 100% { background: var(--color-focus); color: #fff; }
+	}
+	@keyframes fuzzy-match-first {
+		0%, 21.73913% { color: var(--color-muted); font-weight: 400; }
+		27.536232%, 34.782609% { color: var(--color-focus); font-weight: 700; text-decoration-color: transparent; }
+		40.57971%, 100% { color: #fff; font-weight: 700; text-decoration-color: #fff; }
+	}
+	@keyframes fuzzy-match-second {
+		0%, 28.26087% { color: var(--color-muted); font-weight: 400; }
+		34.057971%, 34.782609% { color: var(--color-focus); font-weight: 700; text-decoration-color: transparent; }
+		40.57971%, 100% { color: #fff; font-weight: 700; text-decoration-color: #fff; }
+	}
+	@keyframes fuzzy-match-third {
+		0%, 34.782609% { color: var(--color-muted); font-weight: 400; text-decoration-color: transparent; }
+		40.57971%, 100% { color: #fff; font-weight: 700; text-decoration-color: #fff; }
+	}
+	@keyframes fuzzy-count-all { 0% { opacity: 1; } 21.73913%, 100% { opacity: 0; } }
+	@keyframes fuzzy-count-first { 0%, 28.26087%, 100% { opacity: 0; } 21.73913% { opacity: 1; } }
+	@keyframes fuzzy-count-second { 0%, 34.782609%, 100% { opacity: 0; } 28.26087% { opacity: 1; } }
+	@keyframes fuzzy-count-third { 0% { opacity: 0; } 34.782609%, 100% { opacity: 1; } }
 
 	@media (max-width: 480px) {
 		.demo-stage { min-height: 21rem; }
@@ -156,8 +142,16 @@ const projects = [
 		.result-count { padding-left: 0.3rem; }
 		.opened-result { font-size: 0.8rem; }
 	}
-
+	@media (max-width: 360px) {
+		.demo-half { padding-inline: 0.5rem; }
+	}
 	@media (prefers-reduced-motion: reduce) {
-		.result, .result-list, .opened-result { transition: none; }
+		.fuzzy-demo * { animation: none !important; }
+		.query-text { width: 3ch; }
+		.result-list { opacity: 1; }
+		.result:not([data-match-level='3']) { height: 0; padding-block: 0; opacity: 0; }
+		.result[data-match-level='3'] { background: var(--color-focus); color: #fff; }
+		.match-first, .match-second, .match-third { color: #fff; font-weight: 700; text-decoration-color: #fff; }
+		.count-3 { opacity: 1; }
 	}
 </style>
