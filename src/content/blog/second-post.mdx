@@ -1,0 +1,196 @@
+---
+title: 'Cómo uso mi Mac: navegar con menos fricción'
+description: 'Ventanas, búsquedas y atajos: los principios con los que organizo mi entorno de trabajo y mis flujos con agentes.'
+pubDate: 'Jul 15 2022'
+updatedDate: '2026-11-16'
+articleType: 'guides'
+heroImage: '../../assets/blog-placeholder-4.jpg'
+---
+
+import WindowManagement from '../../components/WindowManagement.astro';
+
+<aside class="mb-8 max-w-3xl border-l-2 border-focus bg-soft px-5 py-4 text-sm leading-6">
+  <strong>Borrador en revisión.</strong> Estoy reorganizando este artículo alrededor de principios. Quedan por concretar los ejemplos del teclado y las mejoras del último apartado.
+</aside>
+
+Mi ordenador ideal responde rápido, se comporta de forma predecible y me deja pensar en lo que estoy haciendo. Doy clase, trabajo con audio y vídeo y programo. Las aplicaciones cambian, pero hay gestos que repito cientos de veces: ir a otra ventana, encontrar un archivo, abrir un proyecto o volver a una tarea que había dejado a medias.
+
+Uso macOS como sistema principal. Con el tiempo he ido ajustando mi entorno para reducir las decisiones pequeñas que se interponen entre una intención y una acción. Quiero poder pensar «voy al navegador» o «vuelvo a este proyecto» y llegar allí sin buscar visualmente dónde ha quedado cada cosa.
+
+Mi configuración gira alrededor de unas pocas ideas:
+
+- **Un lugar predecible para cada contexto.** Volver a una tarea debería resultar fácil.
+- **Buscar por intención.** Recordar parte de un nombre suele ser suficiente.
+- **Un vocabulario de teclado coherente.** Los atajos deberían relacionarse entre sí.
+- **Una configuración que pueda leer y reconstruir.** Las decisiones importantes tienen que quedar escritas.
+- **Automatizar las repeticiones.** También el trabajo necesario para mantener el propio entorno.
+
+## Window management: un lugar al que volver
+
+Gestionar ventanas ocupa una parte sorprendentemente grande del uso de un ordenador. Abrir, minimizar, arrastrar, redimensionar, buscar la que ha quedado detrás… Cada gesto es pequeño, pero todos piden atención.
+
+Lo que busco es una relación estable entre una actividad y su lugar en el escritorio. Si la terminal suele estar en el primer espacio y el navegador en el segundo, puedo ir directamente a ellos. La posición se convierte en una forma de memoria.
+
+### Espacios predecibles
+
+Ahora utilizo AeroSpace para dar un destino a determinadas aplicaciones cuando se abren. Rex va al espacio 1; Zen, al 2; Calendario, al 3. Tengo otros espacios para notas, música y trabajo audiovisual. Esa distribución es una decisión personal que puedo cambiar cuando cambie mi manera de trabajar.
+
+<WindowManagement mode="workspaces" />
+
+El principio es **volver a un contexto con una acción directa**. En mi configuración, `Ctrl + número` cambia de espacio. Añadir `Shift` envía la ventana actual a ese destino. Son dos acciones relacionadas: ir a un lugar y llevar algo a ese lugar.
+
+Conviene distinguir el espacio de trabajo de la aplicación. Un espacio puede reunir varias ventanas necesarias para una tarea. Las reglas por aplicación me dan un punto de partida; después puedo reorganizar ese contexto.
+
+### Separar foco y distribución
+
+Hay dos preguntas diferentes: qué necesito tener delante y cómo quiero repartir la pantalla.
+
+Con una distribución en mosaico puedo consultar varias ventanas a la vez. Me viene bien para comparar, seguir una salida de terminal o trabajar con una referencia abierta. En acordeón, las ventanas se solapan y la que tiene el foco ocupa casi todo el espacio disponible. Eso permite concentrar la atención sin cerrar las demás.
+
+<WindowManagement mode="layouts" />
+
+Mis atajos actuales para estas operaciones son:
+
+| Intención | Atajo |
+| --- | --- |
+| Dar el foco a la ventana de la izquierda | `Ctrl + J` |
+| Dar el foco a la ventana de la derecha | `Ctrl + K` |
+| Repartir las ventanas en mosaico | `Ctrl + Q` |
+| Usar una distribución en acordeón | `Ctrl + W` |
+
+Cambiar el foco conserva la distribución. Cambiar la distribución adapta cuánto veo de cada ventana. Separar ambas cosas me ayuda a moverme sin reorganizar constantemente el escritorio.
+
+También dejo espacio para excepciones. Una videollamada o una ventana de diálogo puede funcionar mejor flotando. La configuración tiene que acomodarse al trabajo real: el objetivo es reducir los ajustes manuales que repito.
+
+## Fuzzy finding: llegar por el nombre
+
+La memoria espacial funciona bien para unos pocos contextos habituales. Para cientos de archivos, proyectos o comandos, prefiero escribir una parte del nombre.
+
+El *fuzzy finding* permite filtrar una lista con caracteres que aparecen en orden, aunque no estén juntos. Por ejemplo, `wvs` puede encontrar **W**a**v**e**S**earch. A medida que escribo, la lista se reduce y puedo elegir el resultado. [fzf](https://github.com/junegunn/fzf) es una de las herramientas con las que llevo esta idea a la terminal.
+
+El patrón que me interesa es siempre parecido:
+
+1. Abrir un selector dentro del contexto adecuado.
+2. Escribir lo poco que recuerdo.
+3. Ver suficientes detalles para distinguir los resultados.
+4. Confirmar y continuar donde quería estar.
+
+Lo puedo aplicar a proyectos, archivos o al historial de comandos. En cada caso cambia la lista; el gesto de navegación permanece. También importa distinguir buscar por nombre de buscar dentro del contenido: a veces recuerdo cómo se llama una nota y otras recuerdo una frase que escribí en ella.
+
+Una buena búsqueda empieza por acotar el universo. Si quiero abrir un proyecto, prefiero buscar entre mis proyectos y evitar resultados de cachés, dependencias o carpetas internas. La calidad de la lista importa tanto como el algoritmo que ordena las coincidencias.
+
+## Keyboard shortcuts: construir un vocabulario
+
+Me interesa que los atajos formen un sistema que pueda aprender poco a poco. Un atajo es útil cuando aparece de forma natural al pensar en la acción.
+
+Los espacios son un ejemplo: un modificador y un número para ir; la misma combinación con `Shift` para mover. Intento mantener esa relación entre las acciones y sus variantes. También procuro distinguir los atajos globales de los que solo tienen sentido dentro de una aplicación.
+
+No todas las acciones necesitan una combinación propia. Reservo los accesos más cómodos para lo que repito mucho. Para operaciones ocasionales, una paleta de comandos o un selector por nombre puede resultar más fácil de recordar.
+
+La navegación con teclado tampoco termina en las ventanas. Cambiar de pestaña, recuperar un comando o elegir una salida de audio pertenecen al mismo recorrido. En Rex, por ejemplo, tengo `Option + ↓` y `Option + ↑` para pasar a la siguiente pestaña o a la anterior. Quiero que estos pequeños movimientos mantengan la continuidad de lo que estoy haciendo.
+
+## Keyboard layout: split y HHKB
+
+La distribución física del teclado condiciona ese vocabulario. La posición de los modificadores, el alcance de las teclas y las capas determinan qué combinaciones resultan cómodas durante una sesión larga.
+
+Con el **split** y el **HHKB** quiero desarrollar una misma idea: conservar las acciones habituales aunque cambie el teclado. En un split puedo ajustar la separación y orientación de las dos mitades. El formato compacto del HHKB plantea otra relación entre el espacio disponible y las funciones que necesito alcanzar. En ambos casos me interesa pensar qué debe estar siempre a mano y qué puede vivir en una capa.
+
+Hay tres niveles que conviene documentar por separado:
+
+- **La distribución física:** dónde están las teclas y cómo coloco las manos.
+- **El mapa lógico:** qué carácter o acción produce cada tecla y qué hacen los modificadores y las capas.
+- **Los atajos del sistema y las aplicaciones:** qué significado doy a esas combinaciones al trabajar.
+
+Quiero conservar la lógica de navegación entre ambos formatos y seguir escribiendo con comodidad en español, euskera e inglés. Los acentos, la `ñ`, los símbolos y las teclas de navegación tienen que encajar en ese diseño.
+
+*Pendiente para la siguiente revisión: añadir los modelos concretos del split y del HHKB, el mapa real de teclas y capas, dónde guardo cada configuración y qué diferencias mantengo respecto al teclado del portátil. No doy por cerrada todavía esa parte del borrador.*
+
+## Configuración declarativa: describir el entorno
+
+Una configuración que solo existe en mi memoria es difícil de mantener. Prefiero poder abrir un archivo y entender qué he decidido, por qué sigue ahí y cómo volver a aplicarlo.
+
+La idea de una configuración declarativa es describir el estado al que quiero llegar. Un Brewfile, por ejemplo, recoge los paquetes que quiero tener disponibles; Homebrew Bundle se encarga de instalarlos o actualizarlos. Su [documentación](https://docs.brew.sh/Brew-Bundle-and-Brewfile) explica ese modelo. El archivo es un inventario revisable, aunque por sí solo no fija todas las versiones ni reconstruye todas las preferencias del Mac.
+
+### .dotfiles: decisiones que puedo revisar
+
+Guardo buena parte de mi configuración en `~/.dotfiles` y utilizo Stow para enlazar los archivos con las ubicaciones donde los esperan las aplicaciones. Ahí mantengo ajustes de la shell, Git, el gestor de ventanas y Rex, además del Brewfile y scripts propios.
+
+Git me permite ver qué cambió y volver a una configuración anterior. También hace visible la acumulación: funciones que ya no uso, atajos duplicados o ajustes cuyo propósito he olvidado. Mantener estos archivos incluye retirar lo que ha dejado de aportar algo.
+
+Esto no equivale a tener una copia completa del ordenador. Hay preferencias que viven fuera de esos archivos, aplicaciones instaladas por otras vías y pasos que todavía requieren intervención. Quiero que esos límites queden documentados.
+
+### brewsync: cerrar el ciclo
+
+`brewsync` es una función propia que conecta el inventario con lo que tengo instalado. Su recorrido actual es sencillo:
+
+1. Abrir `~/.dotfiles/brewfile` para revisarlo.
+2. Actualizar Homebrew y sus definiciones de paquetes.
+3. Instalar lo que falta y actualizar lo declarado.
+4. Eliminar las fórmulas, aplicaciones y repositorios de Homebrew que han quedado fuera de la lista, conservando las dependencias necesarias.
+
+Cada paso se detiene si el anterior falla. La limpieza llega después de una instalación correcta. Eso convierte al Brewfile en una decisión activa: quitar una entrada puede terminar desinstalando esa herramienta al sincronizar.
+
+Lo que me interesa de esta función es que el mantenimiento tenga un recorrido comprensible. Puedo revisar qué quiero conservar y después reconciliar esa decisión con el equipo. Más adelante quiero separar mejor la consulta de cambios, las actualizaciones y la limpieza; lo recojo entre las propuestas del final.
+
+## Automatización: quitar repeticiones del camino
+
+Suelo detectar las automatizaciones mientras trabajo: repetir una secuencia de pasos, volver a buscar la misma opción o tener que recordar un orden concreto. Ahí aparece una oportunidad para convertir la secuencia en una acción con nombre.
+
+Cambiar la salida de audio desde el teclado es un ejemplo pequeño. Puedo pasar de auriculares a altavoces sin abrir varios menús. Preparar un proyecto es otro mayor: entrar en su carpeta, recuperar su contexto y abrir las herramientas que necesito.
+
+Para decidir si una automatización merece quedarse, me hago algunas preguntas: ¿entiendo lo que va a hacer?, ¿puedo ver si ha fallado?, ¿qué ocurre si la ejecuto dos veces?, ¿cuánto cuesta mantenerla cuando cambia una aplicación?
+
+Prefiero empezar por funciones pequeñas que pueda ejecutar manualmente y observar. Si una acción va a borrar o reemplazar algo, quiero poder revisar primero su alcance. Y si una herramienta ya resuelve bien una parte del problema, intento que mi script conecte las piezas sin duplicar toda su lógica.
+
+## Workflows de agentes con Rex
+
+El trabajo con agentes encaja en esta misma forma de organizar el ordenador. Necesito dar un lugar a cada tarea, poder recuperar su contexto y saber dónde revisar el resultado.
+
+Uso Rex como terminal habitual. Su organización en sesiones, pestañas y paneles permite reunir el trabajo de un proyecto, y su [CLI](https://www.superlogical.com/rex/docs/automate/cli) ofrece operaciones para crear sesiones, dividir paneles e inspeccionar su estado. Esa capacidad me interesa para preparar contextos de trabajo que pueda volver a abrir.
+
+El flujo que quiero describir aquí parte de una sesión por proyecto. Dentro puedo mantener la conversación con el agente, un proceso de desarrollo y una terminal para comprobaciones. Tenerlos cerca facilita pasar de una petición al resultado que estoy revisando.
+
+La tarea empieza con un resultado concreto: qué quiero conseguir, qué restricciones hay y cómo podremos comprobarlo. Los archivos `AGENTS.md` conservan preferencias que se repiten entre encargos: soluciones sencillas, aprovechar los tipos, comentarios al día y pruebas centradas en el comportamiento relevante. También dejo claro cuándo estoy haciendo una pregunta y cuándo estoy encargando cambios.
+
+Mi recorrido habitual con un agente es:
+
+1. **Definir el resultado y aportar contexto.** El repositorio y sus instrucciones son el punto de partida.
+2. **Dejar que investigue y trabaje.** La conversación sirve para resolver dudas y corregir el rumbo.
+3. **Comprobar el cambio.** Compilar, probar lo afectado o revisar la salida generada, según el encargo.
+4. **Revisar la entrega.** Leer el diff, entender las decisiones y ver qué queda pendiente.
+5. **Guardar el trabajo.** El agente crea el commit; yo reviso y hago el push.
+
+Cuando hay varias tareas, necesito distinguirlas y limitar cuánto trabajo dejo abierto. Poder lanzar más procesos no resuelve por sí solo la revisión. Un siguiente paso sería aislar los cambios de cada encargo y preparar un punto de retorno claro: qué estaba haciendo, qué ha terminado y qué decisión necesita de mí.
+
+## Qué quiero mejorar — ideas para este borrador
+
+Este apartado es una lista de posibilidades para explorar y editar. **Son propuestas, no una descripción de funciones que ya tenga implementadas.** Quiero escoger las que resuelvan una fricción real y convertir las demás en notas o descartarlas.
+
+### Navegación, teclado y atención
+
+- **Recuperar un contexto completo.** Volver a un proyecto con sus ventanas, carpeta, sesión y referencia, incluso después de reiniciar.
+- **Adaptar los espacios a las pantallas disponibles.** Definir qué ocurre al conectar un monitor, desconectarlo o trabajar solo con el portátil.
+- **Unificar el acceso a búsquedas.** Mantener un gesto reconocible para encontrar proyectos, archivos, notas y comandos, con vistas previas cuando ayuden a elegir.
+- **Revisar el mapa de atajos.** Documentar los que realmente uso, localizar conflictos y dejar las combinaciones cómodas para las acciones frecuentes.
+- **Guardar los mapas del split y del HHKB.** Incluir capas, modificadores y un esquema visual; comprobar qué puedo trasladar al portátil sin reaprenderlo todo.
+- **Preparar un contexto de clase o presentación.** Ajustar legibilidad, notificaciones, ventanas y salida de audio con una acción que también permita recuperar el estado anterior.
+
+### Configuración y mantenimiento
+
+- **Reconstruir el entorno desde una instalación limpia.** Escribir un proceso de arranque con los pasos automatizables y los que todavía tengo que completar a mano.
+- **Detectar diferencias con lo declarado.** Ver qué he instalado o modificado fuera de los dotfiles y decidir si debe incorporarse al inventario.
+- **Separar sincronización, actualización y limpieza.** Añadir a `brewsync` una vista previa y poder revisar las desinstalaciones sin tener que aplicarlas junto con todo lo demás.
+- **Completar los límites del respaldo.** Identificar preferencias de aplicaciones, mapas del teclado y otros ajustes que aún no están guardados. Mantener las credenciales fuera del repositorio y documentar cómo recuperarlas.
+- **Comprobar la recuperación.** Verificar que puedo restaurar la configuración y los datos necesarios; guardar archivos sirve cuando luego sé usarlos para volver a trabajar.
+- **Revisar el coste del entorno.** Retirar scripts y dependencias en desuso, y observar si alguna personalización añade lentitud o mantenimiento innecesario.
+
+### Automatización y agentes
+
+- **Abrir un proyecto con una acción.** Preparar su sesión de Rex, carpeta y procesos habituales mediante una configuración pequeña por proyecto.
+- **Aislar los encargos simultáneos.** Explorar worktrees y sesiones separadas cuando varias tareas puedan tocar el mismo repositorio.
+- **Hacer visible el estado del trabajo.** Distinguir procesos activos, tareas terminadas y peticiones que esperan mi intervención, con avisos que respeten la concentración.
+- **Conservar un punto de retorno.** Dejar una nota breve por tarea con objetivo, decisiones, comprobaciones y siguiente paso, para retomarla sin releer toda la conversación.
+- **Automatizar la preparación de la revisión.** Reunir el diff, las comprobaciones relevantes y una vista del resultado cuando la tarea lo necesite.
+- **Hacer las automatizaciones repetibles.** Evitar procesos duplicados, conservar errores útiles y poder cancelar o deshacer las acciones que lo permitan.
+
+Para la próxima versión quiero añadir un ejemplo completo: sentarme ante el Mac, abrir un proyecto, buscar una referencia, encargar un cambio y revisar la entrega. Ese recorrido debería mostrar dónde ayuda cada principio y dónde todavía pierdo tiempo.

@@ -1,0 +1,273 @@
+---
+interface Props {
+	mode: 'workspaces' | 'layouts';
+}
+
+const { mode } = Astro.props;
+const isWorkspaces = mode === 'workspaces';
+const title = isWorkspaces ? 'Un lugar para cada contexto' : 'La misma pantalla, otra distribución';
+const options = isWorkspaces
+	? [
+		{ label: '1 · Rex', shortcut: 'Ctrl + 1', description: 'Espacio 1: volver al proyecto y a la terminal.' },
+		{ label: '2 · Zen', shortcut: 'Ctrl + 2', description: 'Espacio 2: consultar una referencia en el navegador.' },
+		{ label: '3 · Calendario', shortcut: 'Ctrl + 3', description: 'Espacio 3: consultar la agenda sin reorganizar las ventanas.' },
+	]
+	: [
+		{ label: 'Mosaico', shortcut: 'Ctrl + Q', description: 'Mosaico: la terminal y la referencia permanecen visibles a la vez.' },
+		{ label: 'Acordeón', shortcut: 'Ctrl + W', description: 'Acordeón: la referencia ocupa casi todo el espacio y la terminal queda detrás.' },
+	];
+---
+
+<figure class="window-demo" data-window-management data-mode={mode} data-state="0" aria-label={title}>
+	<div class="demo-heading">
+		<span>{isWorkspaces ? '01 / Espacios' : '02 / Distribución'}</span>
+		<span class="demo-shortcut" data-shortcut-display aria-hidden="true">{options[0].shortcut}</span>
+	</div>
+	<div class="demo-screen" aria-hidden="true">
+		<div class="screen-bar">
+			<span class="screen-mark">{isWorkspaces ? 'Contextos de trabajo' : 'Un mismo espacio'}</span>
+			<span class="screen-dots"><i></i><i></i><i></i></span>
+		</div>
+		<div class="screen-content">
+			<div class="workspace-viewport">
+				<div class:list={['window-container', { 'workspace-track': isWorkspaces, 'layout-windows': !isWorkspaces }]}>
+					<div class="workspace">
+						<div class="demo-window terminal-window">
+							<div class="window-bar"><span>Rex</span><span>~/Dev/blog</span></div>
+							<div class="terminal-content">
+								<span class="terminal-prompt">❯</span> proyecto: blog
+								<div class="terminal-rule"></div>
+								<span class="terminal-muted">Una tarea, su contexto.</span>
+								<div class="skeleton-lines"><i></i><i></i><i></i></div>
+								<span class="terminal-prompt">❯</span><span class="terminal-cursor"></span>
+							</div>
+						</div>
+					</div>
+					<div class="workspace">
+						<div class="demo-window browser-window">
+							<div class="window-bar"><span>{isWorkspaces ? 'Zen' : 'Referencia'}</span><span>↗</span></div>
+							<div class="browser-content">
+								<span class="browser-eyebrow">Notas / Referencias</span>
+								<span class="browser-title">Menos fricción.<br />Más continuidad.</span>
+								<div class="skeleton-lines"><i></i><i></i><i></i></div>
+							</div>
+						</div>
+					</div>
+					{isWorkspaces && (
+						<div class="workspace">
+							<div class="demo-window calendar-window">
+								<div class="window-bar"><span>Calendario</span><span>Semana</span></div>
+								<div class="calendar-content">
+									{['L', 'M', 'X', 'J', 'V'].map((day, index) => (
+										<div class="calendar-day">
+											<span>{day}</span>
+											<div class:list={['calendar-event', { 'event-late': index % 2 !== 0 }]}>
+												{index === 0 ? 'Clase' : index === 2 ? 'Proyecto' : ''}
+											</div>
+										</div>
+									))}
+								</div>
+							</div>
+						</div>
+					)}
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="demo-controls" data-controls hidden>
+		<div class="demo-options" role="group" aria-label={isWorkspaces ? 'Elegir un espacio en la demostración' : 'Elegir una distribución en la demostración'}>
+			{options.map((option, index) => (
+				<button type="button" data-option={index} data-shortcut={option.shortcut} data-description={option.description} aria-pressed={index === 0}>
+					{option.label}
+				</button>
+			))}
+		</div>
+		<button type="button" class="demo-replay" data-replay aria-label={`Repetir animación: ${title}`}>
+			<span aria-hidden="true">↻</span> Repetir
+		</button>
+	</div>
+	<figcaption>
+		<span data-state-description>{options[0].description}</span>
+		<span class="demo-note">Demostración simplificada del principio.</span>
+	</figcaption>
+</figure>
+
+<script>
+	// Each figure plays once on arrival. The buttons let readers explore it at their own pace.
+	document.querySelectorAll<HTMLElement>('[data-window-management]').forEach((demo) => {
+		const buttons = Array.from(demo.querySelectorAll<HTMLButtonElement>('[data-option]'));
+		const controls = demo.querySelector<HTMLElement>('[data-controls]');
+		const shortcut = demo.querySelector<HTMLElement>('[data-shortcut-display]');
+		const description = demo.querySelector<HTMLElement>('[data-state-description]');
+		const replay = demo.querySelector<HTMLButtonElement>('[data-replay]');
+		const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+		let timers: ReturnType<typeof setTimeout>[] = [];
+
+		const selectState = (state: number) => {
+			demo.dataset.state = String(state);
+			buttons.forEach((button, index) => button.setAttribute('aria-pressed', String(index === state)));
+			if (shortcut) shortcut.textContent = buttons[state].dataset.shortcut ?? '';
+			if (description) description.textContent = buttons[state].dataset.description ?? '';
+		};
+
+		const stopAnimation = () => {
+			timers.forEach(clearTimeout);
+			timers = [];
+		};
+
+		const play = () => {
+			stopAnimation();
+			if (motionPreference.matches) return;
+			selectState(0);
+			// The full sequence finishes in under four seconds and never loops.
+			for (let step = 1; step <= buttons.length; step++) {
+				timers.push(setTimeout(() => selectState(step % buttons.length), step * 1000));
+			}
+		};
+
+		if (controls) controls.hidden = false;
+
+		const observer = new IntersectionObserver(([entry]) => {
+			if (!entry.isIntersecting) return;
+			play();
+			observer.disconnect();
+		}, { threshold: 0.5 });
+		observer.observe(demo);
+
+		buttons.forEach((button, index) => {
+			button.addEventListener('click', () => {
+				observer.disconnect();
+				stopAnimation();
+				selectState(index);
+			});
+		});
+
+		replay?.addEventListener('click', () => {
+			observer.disconnect();
+			play();
+		});
+
+		motionPreference.addEventListener('change', () => {
+			if (motionPreference.matches) stopAnimation();
+		});
+	});
+</script>
+
+<style>
+	.window-demo {
+		margin: 2rem 0;
+		max-width: 48rem;
+		font-size: 0.75rem;
+		line-height: 1.5;
+	}
+
+	.demo-heading, .screen-bar, .window-bar, .demo-controls, .demo-options {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
+	}
+
+	.demo-heading {
+		margin-bottom: 0.75rem;
+		font-size: 0.65rem;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--color-muted);
+	}
+
+	.demo-shortcut {
+		font-family: var(--font-mono);
+		letter-spacing: 0;
+		text-transform: none;
+		color: var(--color-focus);
+	}
+
+	.demo-screen {
+		overflow: hidden;
+		border: 1px solid var(--color-line);
+		background: var(--color-soft);
+	}
+
+	.screen-bar {
+		padding: 0.6rem 0.9rem;
+		border-bottom: 1px solid var(--color-line);
+		background: var(--color-paper);
+		color: var(--color-muted);
+		font-size: 0.65rem;
+	}
+
+	.screen-dots { display: flex; gap: 0.3rem; }
+	.screen-dots i { width: 4px; height: 4px; border-radius: 50%; background: var(--color-muted); }
+	.screen-content { padding: 1rem; overflow: hidden; }
+	.workspace-viewport { overflow: hidden; }
+	.window-container { position: relative; height: 14rem; }
+
+	.workspace-track {
+		display: flex;
+		transition: transform 450ms cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.workspace { flex: 0 0 100%; min-width: 0; }
+	.workspace-track .workspace { padding: 0 0.5rem; }
+	.window-demo[data-mode='workspaces'][data-state='1'] .workspace-track { transform: translateX(-100%); }
+	.window-demo[data-mode='workspaces'][data-state='2'] .workspace-track { transform: translateX(-200%); }
+
+	.demo-window {
+		height: 100%;
+		overflow: hidden;
+		border: 1px solid var(--color-line);
+		background: var(--color-paper);
+	}
+
+	.workspace-track .demo-window { border-color: var(--color-focus); }
+	.window-bar { height: 2rem; padding: 0 0.85rem; border-bottom: 1px solid var(--color-line); font-size: 0.65rem; }
+	.window-bar span:last-child { color: var(--color-muted); }
+	.terminal-content { padding: 1.25rem 1rem; font-family: var(--font-mono); font-size: 0.7rem; white-space: nowrap; }
+	.terminal-prompt { margin-right: 0.5rem; color: var(--color-focus); }
+	.terminal-muted { color: var(--color-muted); }
+	.terminal-rule { width: 2.5rem; margin: 0.65rem 0; border-top: 1px solid var(--color-line); }
+	.terminal-cursor { display: inline-block; height: 0.8rem; width: 0.4rem; background: var(--color-focus); vertical-align: middle; }
+	.skeleton-lines { display: grid; gap: 0.5rem; margin: 1rem 0; }
+	.skeleton-lines i { display: block; width: 78%; height: 3px; background: var(--color-line); }
+	.skeleton-lines i:nth-child(2) { width: 60%; }
+	.skeleton-lines i:nth-child(3) { width: 68%; }
+	.browser-content { padding: 1.25rem 1rem; }
+	.browser-eyebrow { display: block; margin-bottom: 0.65rem; font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-muted); }
+	.browser-title { display: block; font-size: clamp(1rem, 3vw, 1.4rem); line-height: 1.2; font-weight: 600; letter-spacing: -0.025em; }
+	.calendar-content { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); height: calc(100% - 2rem); padding: 0.75rem; }
+	.calendar-day { min-width: 0; padding: 0 0.3rem; border-right: 1px solid var(--color-line); color: var(--color-muted); font-size: 0.6rem; }
+	.calendar-day:last-child { border: 0; }
+	.calendar-day > span { display: block; text-align: center; }
+	.calendar-event { margin-top: 1rem; min-height: 2.5rem; padding: 0.4rem 0.2rem; overflow: hidden; border-left: 2px solid var(--color-focus); background: var(--color-soft); color: var(--color-ink); font-size: 0.55rem; }
+	.event-late { margin-top: 3rem; }
+
+	.layout-windows .workspace {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: calc(50% - 0.375rem);
+		height: 100%;
+		transition: width 450ms cubic-bezier(0.22, 1, 0.36, 1), left 450ms cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.layout-windows .workspace:nth-child(2) { left: calc(50% + 0.375rem); }
+	.layout-windows .browser-window { border-color: var(--color-focus); }
+	.window-demo[data-mode='layouts'][data-state='1'] .workspace { width: calc(100% - 2rem); }
+	.window-demo[data-mode='layouts'][data-state='1'] .workspace:nth-child(2) { left: 2rem; }
+
+	.demo-controls { margin-top: 0.75rem; gap: 0.5rem; flex-wrap: wrap; }
+	.demo-controls[hidden] { display: none; }
+	.demo-options { justify-content: flex-start; gap: 0.25rem; flex-wrap: wrap; }
+	.demo-controls button { min-height: 2.75rem; padding: 0.4rem 0.65rem; border: 1px solid transparent; font: inherit; color: var(--color-muted); cursor: pointer; }
+	.demo-controls button:hover { color: var(--color-ink); background: var(--color-soft); }
+	.demo-controls button[aria-pressed='true'] { border-color: var(--color-line); background: var(--color-soft); color: var(--color-ink); }
+	.demo-replay span { font-size: 1rem; }
+	figcaption { margin-top: 0.65rem; color: var(--color-muted); }
+	.demo-note { display: block; margin-top: 0.2rem; font-size: 0.65rem; }
+
+	@media (prefers-reduced-motion: reduce) {
+		.workspace-track, .layout-windows .workspace { transition: none; }
+		.demo-replay { display: none; }
+	}
+</style>
