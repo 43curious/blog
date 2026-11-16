@@ -1,4 +1,6 @@
 ---
+import AudioRouting from './AudioRouting.astro';
+
 interface Props {
 	mode: 'workspaces' | 'layouts' | 'focus' | 'audio';
 }
@@ -50,11 +52,15 @@ const { shortcuts, targets, description, label } = {
 		<span class="demo-arrow">→</span>
 		<div class="demo-half application-half">
 			<span class="half-label">{label}</span>
-			<div class:list={['application-stage', { 'layout-stage': hasTwoWindows, 'focus-stage': mode === 'focus' }]}>
-				{targets.map((name, index) => (
-					<div class:list={['application-window', { 'is-current': index === 0 }]} data-application>{name}</div>
-				))}
-			</div>
+			{mode === 'audio' ? (
+				<AudioRouting devices={targets} />
+			) : (
+				<div class:list={['application-stage', { 'layout-stage': hasTwoWindows, 'focus-stage': mode === 'focus' }]}>
+					{targets.map((name, index) => (
+						<div class:list={['application-window', { 'is-current': index === 0 }]} data-application>{name}</div>
+					))}
+				</div>
+			)}
 		</div>
 	</div>
 	<figcaption>{description}</figcaption>
@@ -270,10 +276,8 @@ const { shortcuts, targets, description, label } = {
 		transform: translateY(0);
 	}
 
-	.window-demo[data-mode='audio'] .application-window {
-		padding: 1rem;
-		text-align: center;
-		line-height: 1.4;
+	.window-demo[data-mode='audio'] .key-combo {
+		height: 9rem;
 	}
 
 	.layout-stage {
