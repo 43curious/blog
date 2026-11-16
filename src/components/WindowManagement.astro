@@ -53,7 +53,7 @@ const { shortcuts, description, label } = {
 </figure>
 
 <script>
-	// Preview each combination before pressing it, then apply its effect. Loop only while visible.
+	// Change the key after its release transition finishes. Loop only while visible.
 	document.querySelectorAll<HTMLElement>('[data-window-management]').forEach((demo) => {
 		const modifier = demo.querySelector<HTMLElement>('[data-modifier]');
 		const keycap = demo.querySelector<HTMLElement>('[data-keycap]');
@@ -61,8 +61,10 @@ const { shortcuts, description, label } = {
 		const applications = Array.from(demo.querySelectorAll<HTMLElement>('[data-application]'));
 		const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
 		let currentStep = 0;
+		let appliedStep = 0;
 		let inView = false;
 		let playing = false;
+		let pendingStep: number | undefined;
 		let loopTimer: number | undefined;
 		let phaseTimers: number[] = [];
 
@@ -75,32 +77,43 @@ const { shortcuts, description, label } = {
 			keycap?.classList.remove('is-pressed');
 		};
 
+		keycap?.addEventListener('transitionend', (event) => {
+			if (!keycap || event.target !== keycap || event.propertyName !== 'transform') return;
+			if (keycap.classList.contains('is-pressed') || pendingStep === undefined) return;
+			currentStep = pendingStep;
+			pendingStep = undefined;
+			selectKey(currentStep);
+		});
+
 		const stop = () => {
 			window.clearTimeout(loopTimer);
 			phaseTimers.forEach(window.clearTimeout);
 			phaseTimers = [];
 			playing = false;
+			pendingStep = undefined;
 			releaseKeys();
+			currentStep = appliedStep;
 			selectKey(currentStep);
 		};
 
 		const advance = () => {
-			const nextStep = (currentStep + 1) % keys.length;
+			const step = currentStep;
 			const previewDelay = 500;
-			releaseKeys();
-			selectKey(nextStep);
 			phaseTimers = [
 				window.setTimeout(() => modifier?.classList.add('is-pressed'), previewDelay),
 				window.setTimeout(() => keycap?.classList.add('is-pressed'), previewDelay + 140),
 				window.setTimeout(() => {
-					currentStep = nextStep;
+					appliedStep = step;
 					if (demo.dataset.mode === 'layouts') {
-						demo.dataset.layout = currentStep === 0 ? 'tiles' : 'accordion';
+						demo.dataset.layout = step === 0 ? 'tiles' : 'accordion';
 					} else {
-						applications.forEach((app, index) => app.classList.toggle('is-current', index === currentStep));
+						applications.forEach((app, index) => app.classList.toggle('is-current', index === step));
 					}
 				}, previewDelay + 360),
-				window.setTimeout(releaseKeys, previewDelay + 720),
+				window.setTimeout(() => {
+					pendingStep = (step + 1) % keys.length;
+					releaseKeys();
+				}, previewDelay + 720),
 			];
 			loopTimer = window.setTimeout(advance, 2700);
 		};
