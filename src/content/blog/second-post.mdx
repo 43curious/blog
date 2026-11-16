@@ -9,6 +9,7 @@ heroImage: '../../assets/blog-placeholder-4.jpg'
 
 import WindowManagement from '../../components/WindowManagement.astro';
 import FuzzyFinding from '../../components/FuzzyFinding.astro';
+import DeclarativeConfig from '../../components/DeclarativeConfig.astro';
 
 <aside class="mb-8 max-w-3xl border-l-2 border-focus bg-soft px-5 py-4 text-sm leading-6">
   <strong>Borrador en revisión.</strong> Estoy reorganizando este artículo alrededor de principios. Quedan por concretar los ejemplos del teclado y las mejoras del último apartado.
@@ -119,6 +120,8 @@ Quiero conservar la lógica de navegación entre ambos formatos y seguir escribi
 Una configuración que solo existe en mi memoria es difícil de mantener. Prefiero poder abrir un archivo y entender qué he decidido, por qué sigue ahí y cómo volver a aplicarlo.
 
 La idea de una configuración declarativa es describir el estado al que quiero llegar. Un Brewfile, por ejemplo, recoge los paquetes que quiero tener disponibles; Homebrew Bundle se encarga de instalarlos o actualizarlos. Su [documentación](https://docs.brew.sh/Brew-Bundle-and-Brewfile) explica ese modelo. El archivo es un inventario revisable, aunque por sí solo no fija todas las versiones ni reconstruye todas las preferencias del Mac.
+
+<DeclarativeConfig />
 
 ### .dotfiles: decisiones que puedo revisar
 
