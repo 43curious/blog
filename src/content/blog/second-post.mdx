@@ -8,6 +8,7 @@ heroImage: '../../assets/blog-placeholder-4.jpg'
 ---
 
 import WindowManagement from '../../components/WindowManagement.astro';
+import FuzzyFinding from '../../components/FuzzyFinding.astro';
 
 <aside class="mb-8 max-w-3xl border-l-2 border-focus bg-soft px-5 py-4 text-sm leading-6">
   <strong>Borrador en revisión.</strong> Estoy reorganizando este artículo alrededor de principios. Quedan por concretar los ejemplos del teclado y las mejoras del último apartado.
@@ -69,6 +70,8 @@ También dejo espacio para excepciones. Una videollamada o una ventana de diálo
 La memoria espacial funciona bien para unos pocos contextos habituales. Para cientos de archivos, proyectos o comandos, prefiero escribir una parte del nombre.
 
 El *fuzzy finding* permite filtrar una lista con caracteres que aparecen en orden, aunque no estén juntos. Por ejemplo, `wvs` puede encontrar **W**a**v**e**S**earch. A medida que escribo, la lista se reduce y puedo elegir el resultado. [fzf](https://github.com/junegunn/fzf) es una de las herramientas con las que llevo esta idea a la terminal.
+
+<FuzzyFinding />
 
 El patrón que me interesa es siempre parecido:
 
