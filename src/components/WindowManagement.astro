@@ -1,26 +1,34 @@
 ---
 interface Props {
-	mode: 'workspaces' | 'layouts' | 'focus';
+	mode: 'workspaces' | 'layouts' | 'focus' | 'audio';
 }
 
 const { mode } = Astro.props;
-const isWorkspaces = mode === 'workspaces';
-const applications = ['Rex', 'Zen', 'Calendario'];
-const { shortcuts, description, label } = {
+const hasTwoWindows = mode === 'layouts' || mode === 'focus';
+const { shortcuts, targets, description, label } = {
 	workspaces: {
 		shortcuts: ['1', '2', '3'],
+		targets: ['Rex', 'Zen', 'Calendario'],
 		description: 'Ctrl + 1 → Rex · Ctrl + 2 → Zen · Ctrl + 3 → Calendario.',
 		label: 'Aplicación',
 	},
 	layouts: {
 		shortcuts: ['Q', 'W'],
+		targets: ['Rex', 'Zen'],
 		description: 'Ctrl + Q → mosaico · Ctrl + W → acordeón.',
 		label: 'Distribución',
 	},
 	focus: {
 		shortcuts: ['J', 'K'],
+		targets: ['Rex', 'Zen'],
 		description: 'Ctrl + J → foco a la izquierda · Ctrl + K → foco a la derecha.',
 		label: 'Foco',
+	},
+	audio: {
+		shortcuts: ['E', 'R'],
+		targets: ['EarPods', 'Altavoces del MacBook Pro'],
+		description: 'Ctrl + E → EarPods · Ctrl + R → altavoces del MacBook Pro.',
+		label: 'Salida de audio',
 	},
 }[mode];
 ---
@@ -42,8 +50,8 @@ const { shortcuts, description, label } = {
 		<span class="demo-arrow">→</span>
 		<div class="demo-half application-half">
 			<span class="half-label">{label}</span>
-			<div class:list={['application-stage', { 'layout-stage': !isWorkspaces, 'focus-stage': mode === 'focus' }]}>
-				{(isWorkspaces ? applications : applications.slice(0, 2)).map((name, index) => (
+			<div class:list={['application-stage', { 'layout-stage': hasTwoWindows, 'focus-stage': mode === 'focus' }]}>
+				{targets.map((name, index) => (
 					<div class:list={['application-window', { 'is-current': index === 0 }]} data-application>{name}</div>
 				))}
 			</div>
@@ -260,6 +268,12 @@ const { shortcuts, description, label } = {
 	.application-window.is-current {
 		opacity: 1;
 		transform: translateY(0);
+	}
+
+	.window-demo[data-mode='audio'] .application-window {
+		padding: 1rem;
+		text-align: center;
+		line-height: 1.4;
 	}
 
 	.layout-stage {
