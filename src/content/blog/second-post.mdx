@@ -9,7 +9,9 @@ heroImage: '../../assets/blog-placeholder-4.jpg'
 
 import WindowManagement from '../../components/WindowManagement.astro';
 import FuzzyFinding from '../../components/FuzzyFinding.astro';
+import KeyboardLayout from '../../components/KeyboardLayout.astro';
 import DeclarativeConfig from '../../components/DeclarativeConfig.astro';
+import ProjectAutomation from '../../components/ProjectAutomation.astro';
 
 <aside class="mb-8 max-w-3xl border-l-2 border-focus bg-soft px-5 py-4 text-sm leading-6">
   <strong>Borrador en revisión.</strong> Estoy reorganizando este artículo alrededor de principios. Quedan por concretar los ejemplos del teclado y las mejoras del último apartado.
@@ -105,6 +107,8 @@ La distribución física del teclado condiciona ese vocabulario. La posición de
 
 Con el **split** y el **HHKB** quiero desarrollar una misma idea: conservar las acciones habituales aunque cambie el teclado. En un split puedo ajustar la separación y orientación de las dos mitades. El formato compacto del HHKB plantea otra relación entre el espacio disponible y las funciones que necesito alcanzar. En ambos casos me interesa pensar qué debe estar siempre a mano y qué puede vivir en una capa.
 
+<KeyboardLayout />
+
 Hay tres niveles que conviene documentar por separado:
 
 - **La distribución física:** dónde están las teclas y cómo coloco las manos.
@@ -149,6 +153,8 @@ Lo que me interesa de esta función es que el mantenimiento tenga un recorrido c
 Suelo detectar las automatizaciones mientras trabajo: repetir una secuencia de pasos, volver a buscar la misma opción o tener que recordar un orden concreto. Ahí aparece una oportunidad para convertir la secuencia en una acción con nombre.
 
 Cambiar la salida de audio desde el teclado es un ejemplo pequeño. Puedo pasar de auriculares a altavoces sin abrir varios menús. Preparar un proyecto es otro mayor: entrar en su carpeta, recuperar su contexto y abrir las herramientas que necesito.
+
+<ProjectAutomation />
 
 Para decidir si una automatización merece quedarse, me hago algunas preguntas: ¿entiendo lo que va a hacer?, ¿puedo ver si ha fallado?, ¿qué ocurre si la ejecuto dos veces?, ¿cuánto cuesta mantenerla cuando cambia una aplicación?
 

@@ -1,0 +1,141 @@
+---
+const steps = ['Abrir carpeta', 'Recuperar contexto', 'Abrir herramientas'];
+---
+
+<figure class="automation-demo">
+	<div class="demo-stage" aria-hidden="true">
+		<div class="demo-half">
+			<span class="half-label">Paso a paso</span>
+			<div class="manual-steps">
+				{steps.map((step, index) => (
+					<span class="manual-step" style={`--step-index: ${index}`}>{step}</span>
+				))}
+			</div>
+		</div>
+		<span class="demo-arrow">→</span>
+		<div class="demo-half">
+			<span class="half-label">Una acción</span>
+			<div class="automation-preview">
+				<span class="project-action">Abrir proyecto</span>
+				<span class="project-ready"><span>✓</span> Proyecto listo</span>
+			</div>
+		</div>
+	</div>
+	<figcaption>Ejemplo de automatización. «Abrir proyecto» reúne la carpeta, el contexto y las herramientas en una acción.</figcaption>
+</figure>
+
+<style>
+	.automation-demo {
+		--project-cycle: 6s;
+		--active-ink: light-dark(#fff, #08071d);
+		margin: 2rem 0;
+		max-width: 48rem;
+	}
+
+	.demo-stage {
+		position: relative;
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		min-height: 14rem;
+	}
+
+	.demo-half {
+		display: flex;
+		min-width: 0;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 1.25rem;
+		padding: 1.5rem clamp(0.8rem, 4vw, 1.5rem);
+	}
+
+	.half-label {
+		color: var(--color-muted);
+		font-size: 0.6rem;
+		line-height: 1;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+	}
+
+	.manual-steps, .automation-preview {
+		display: grid;
+		width: 100%;
+		max-width: 13rem;
+		height: 7.5rem;
+		align-content: center;
+		gap: 0.5rem;
+	}
+
+	.manual-step, .project-action, .project-ready {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		min-height: 2rem;
+		padding: 0.15rem 0.25rem;
+		border: 1px solid var(--color-line);
+		text-align: center;
+		font-size: clamp(0.7rem, 2.3vw, 0.85rem);
+		line-height: 1.2;
+	}
+
+	.manual-step { background: var(--color-soft); }
+
+	.demo-arrow {
+		position: absolute;
+		top: calc(50% + 0.925rem);
+		left: 50%;
+		transform: translate(-50%, -50%);
+		color: var(--color-muted);
+		font-size: 1.2rem;
+		line-height: 1;
+	}
+
+	.automation-preview { justify-items: center; }
+
+	.project-action {
+		padding-inline: 0.55rem;
+		border-radius: 0.25rem;
+		background: var(--color-paper);
+		box-shadow: 0 3px 0 var(--color-line);
+		font-family: var(--font-mono);
+	}
+
+	.project-ready {
+		width: 100%;
+		min-height: 2.6rem;
+		gap: 0.35rem;
+		margin-top: 0.3rem;
+		border-color: var(--color-focus);
+		background: var(--color-focus);
+		color: var(--active-ink);
+		font-weight: 500;
+	}
+
+	figcaption { margin-top: 0.65rem; color: var(--color-muted); font-size: 0.7rem; line-height: 1.6; }
+
+	@media (prefers-reduced-motion: no-preference) {
+		.manual-step {
+			animation: project-manual-step var(--project-cycle) ease infinite;
+			animation-delay: calc(var(--step-index) * 0.9s);
+		}
+
+		.project-action { animation: project-start var(--project-cycle) ease infinite; }
+		.project-ready { animation: project-finish var(--project-cycle) ease infinite; }
+	}
+
+	/* Each manual step starts 0.9s after the previous one. The single action follows at 3s. */
+	@keyframes project-manual-step {
+		0%, 5%, 14%, 100% { background: var(--color-soft); border-color: var(--color-line); color: var(--color-ink); }
+		7%, 12% { background: var(--color-focus); border-color: var(--color-focus); color: var(--active-ink); }
+	}
+
+	@keyframes project-start {
+		0%, 50%, 62%, 100% { transform: translateY(0); background: var(--color-paper); border-color: var(--color-line); color: var(--color-ink); box-shadow: 0 3px 0 var(--color-line); }
+		53%, 58% { transform: translateY(3px); background: var(--color-focus); border-color: var(--color-focus); color: var(--active-ink); box-shadow: none; }
+	}
+
+	@keyframes project-finish {
+		0%, 54%, 100% { opacity: 0; transform: translateY(0.35rem); }
+		62%, 92% { opacity: 1; transform: translateY(0); }
+	}
+</style>

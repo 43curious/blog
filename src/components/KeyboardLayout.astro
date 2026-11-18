@@ -1,0 +1,179 @@
+---
+type Key = number | 'Fn' | 'J';
+
+const left: Key[][] = [
+	[1, 1, 1, 1, 1],
+	[1, 1, 1, 1, 1],
+	[1, 1, 1, 1, 1],
+	[1, 1, 'Fn'],
+];
+const right: Key[][] = [
+	[1, 1, 1, 1, 1],
+	[1, 'J', 1, 1, 1],
+	[1, 1, 1, 1, 1],
+	[1.75, 1, 1],
+];
+const compact: Key[][] = [
+	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+	[1.5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1.5],
+	[1.75, 1, 1, 1, 1, 1, 1, 'J', 1, 1, 1, 1, 1.25],
+	[2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1.5, 'Fn'],
+	[1.5, 1.5, 6, 1.5, 1.5],
+];
+const layouts = [
+	{ name: 'Split', parts: [left, right] },
+	{ name: 'HHKB', parts: [compact] },
+];
+---
+
+<figure class="keyboard-demo">
+	<div class="demo-stage" aria-hidden="true">
+		<div class="layouts">
+			{layouts.map(({ name, parts }) => (
+				<div class="layout">
+					<span class="layout-label">{name}</span>
+					<div class:list={['keyboard', { split: parts.length === 2 }]}>
+						{parts.map((rows) => (
+							<div class="keyboard-part">
+								{rows.map((row) => (
+									<div class="key-row">
+										{row.map((key) => {
+											const label = typeof key === 'string' ? key : undefined;
+											const units = typeof key === 'number' ? key : key === 'Fn' ? 1.85 : 1;
+											return <span class="key" data-key={label} style={`--units: ${units}`}>{label}</span>;
+										})}
+									</div>
+								))}
+							</div>
+						))}
+					</div>
+				</div>
+			))}
+		</div>
+		<span class="result-arrow">↓</span>
+		<div class="editor-preview"><span class="editor-text">abc<span class="cursor"></span></span></div>
+	</div>
+	<figcaption>Ejemplo de capa de navegación. En el split y el HHKB, Fn + J mueve el cursor una posición a la izquierda.</figcaption>
+</figure>
+
+<style>
+	.keyboard-demo {
+		--keyboard-cycle: 4.4s;
+		--key-height: clamp(0.65rem, 1.9vw, 0.95rem);
+		--key-gap: clamp(0.12rem, 0.4vw, 0.22rem);
+		--key-accent: color-mix(in srgb, var(--color-focus) 12%, var(--color-paper));
+		--key-outline: color-mix(in srgb, var(--color-focus) 50%, var(--color-paper));
+		margin: 2rem 0;
+		max-width: 48rem;
+	}
+
+	.demo-stage {
+		display: grid;
+		justify-items: center;
+		gap: 0.8rem;
+		padding: 1.5rem clamp(0.25rem, 3vw, 1.5rem);
+	}
+
+	.layouts {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: clamp(0.65rem, 6vw, 3rem);
+		width: 100%;
+		max-width: 31rem;
+	}
+
+	.layout {
+		display: grid;
+		justify-items: center;
+		align-items: center;
+		grid-template-rows: auto 1fr;
+		gap: 1.15rem;
+	}
+
+	.layout-label {
+		color: var(--color-muted);
+		font-size: 0.6rem;
+		line-height: 1;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+	}
+
+	.keyboard { display: grid; width: 100%; }
+	.keyboard.split { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(0.45rem, 1.9vw, 1.1rem); }
+
+	.keyboard-part {
+		display: grid;
+		gap: var(--key-gap);
+		padding: 0.25rem;
+		border: 1px solid var(--color-line);
+		border-radius: 0.3rem;
+		background: var(--color-soft);
+	}
+
+	.split .keyboard-part:first-child { transform: rotate(5deg); }
+	.split .keyboard-part:last-child { transform: rotate(-5deg); }
+	.split .key-row:last-child { width: 68%; margin-top: 0.1rem; }
+	.split .keyboard-part:first-child .key-row:last-child { justify-self: end; }
+	.keyboard:not(.split) .key-row:last-child { width: 85%; justify-self: center; }
+	.key-row { display: flex; gap: var(--key-gap); }
+
+	.key {
+		display: grid;
+		place-items: center;
+		flex: var(--units) 1 0;
+		min-width: 0;
+		height: var(--key-height);
+		border: 1px solid var(--color-line);
+		border-radius: 0.15rem;
+		background: var(--color-paper);
+	}
+
+	.key[data-key] {
+		box-shadow: 0 2px 0 var(--color-line);
+		background: var(--key-accent);
+		border-color: var(--key-outline);
+		color: var(--color-ink);
+		font: 500 clamp(0.45rem, 1.1vw, 0.6rem) / 1 var(--font-mono);
+	}
+
+	.result-arrow { color: var(--color-muted); font-size: 1.2rem; line-height: 1; }
+
+	.editor-preview {
+		display: grid;
+		place-items: center;
+		width: 6rem;
+		height: 2.45rem;
+		border: 1px solid var(--color-line);
+		background: var(--color-soft);
+		font: 0.95rem / 1 var(--font-mono);
+	}
+
+	.editor-text { position: relative; letter-spacing: 0.12em; }
+	.cursor { position: absolute; inset-block: 0; inset-inline-start: calc(2ch + 0.18em); width: 2px; background: var(--color-focus); }
+	figcaption { margin-top: 0.65rem; color: var(--color-muted); font-size: 0.7rem; line-height: 1.6; }
+
+	@media (prefers-reduced-motion: no-preference) {
+		.key[data-key='Fn'] { animation: keyboard-hold-layer var(--keyboard-cycle) ease infinite; }
+		.key[data-key='J'] { animation: keyboard-press-j var(--keyboard-cycle) ease infinite; }
+		.cursor { animation: keyboard-move-cursor var(--keyboard-cycle) ease infinite; }
+	}
+
+	/* Hold Fn, press J, move the cursor, and release J before Fn. */
+	@keyframes keyboard-hold-layer {
+		0%, 17%, 57%, 100% { transform: translateY(0); background: var(--key-accent); border-color: var(--key-outline); color: var(--color-ink); box-shadow: 0 2px 0 var(--color-line); }
+		22%, 52% { transform: translateY(2px); background: var(--color-focus); border-color: var(--color-focus); color: light-dark(#fff, #08071d); box-shadow: none; }
+	}
+
+	@keyframes keyboard-press-j {
+		0%, 31%, 50%, 100% { transform: translateY(0); background: var(--key-accent); border-color: var(--key-outline); color: var(--color-ink); box-shadow: 0 2px 0 var(--color-line); }
+		36%, 45% { transform: translateY(2px); background: var(--color-focus); border-color: var(--color-focus); color: light-dark(#fff, #08071d); box-shadow: none; }
+	}
+
+	@keyframes keyboard-move-cursor {
+		0%, 36% { transform: translateX(calc(1ch + 0.12em)); opacity: 1; }
+		42%, 87% { transform: translateX(0); opacity: 1; }
+		92% { transform: translateX(0); opacity: 0; }
+		93% { transform: translateX(calc(1ch + 0.12em)); opacity: 0; }
+		98%, 100% { transform: translateX(calc(1ch + 0.12em)); opacity: 1; }
+	}
+</style>
