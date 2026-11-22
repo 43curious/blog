@@ -6,12 +6,13 @@ type Props = HTMLAttributes<'a'>;
 const { href, class: className, ...props } = Astro.props;
 const pathname = Astro.url.pathname.replace(import.meta.env.BASE_URL, '');
 const subpath = pathname.match(/[^\/]+/g);
-const currentPath = '/' + (subpath?.[0] || '');
-const isActive = href === pathname || href === currentPath || (href === '/' && currentPath === '/blog');
+const currentPath = subpath ? `/${subpath[0]}/` : '/';
+const isActive = href === pathname || href === currentPath || (href === '/' && currentPath === '/blog/');
 ---
 
 <a
 	href={href}
+	data-astro-prefetch
 	class:list={[
 		className,
 		'group relative mt-3 inline-flex self-start items-center gap-2 leading-[1.4] text-inherit no-underline first:mt-0 hover:text-ink md:mt-[0.35rem]',

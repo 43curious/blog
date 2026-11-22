@@ -3,13 +3,13 @@ import HeaderLink from './HeaderLink.astro';
 
 const links = [
 	{ href: '/', label: 'Inicio' },
-	{ href: '/resources', label: 'Recursos' },
-	{ href: '/projects', label: 'Proyectos' },
+	{ href: '/resources/', label: 'Recursos' },
+	{ href: '/projects/', label: 'Proyectos' },
 ];
 
 const pathname = Astro.url.pathname.replace(import.meta.env.BASE_URL, '');
 const subpath = pathname.match(/[^\/]+/g);
-const currentPath = '/' + (subpath?.[0] || '');
+const currentPath = subpath ? `/${subpath[0]}/` : '/';
 const currentLink = links.find((link) => link.href === pathname || link.href === currentPath) ?? links[0];
 ---
 

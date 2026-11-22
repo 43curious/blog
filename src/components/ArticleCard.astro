@@ -16,6 +16,7 @@ const dateLabel = post.data.pubDate.toLocaleDateString('es-ES', {
 <article class="article-card border-b border-line" data-article-type={post.data.articleType}>
 	<a
 		href={`/blog/${post.id}/`}
+		data-astro-prefetch="viewport"
 		class="flex flex-col items-start justify-between gap-1 py-4 transition-colors duration-150 hover:bg-soft md:flex-row md:items-baseline md:gap-4"
 	>
 		<h2 class="text-xl font-semibold leading-tight text-ink md:text-2xl">{post.data.title}</h2>
